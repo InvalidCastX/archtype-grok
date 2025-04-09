@@ -8,6 +8,7 @@ let scores = {
   creativity: 0
 };
 let randomizedQuestions = [];
+let answers = []; // Array to store user answers (index of selected option per question)
 let progress = 0; // For progress bar animation
 
 const questions = [
@@ -119,7 +120,7 @@ const questions = [
     { text: "It’s a tool for good", traits: { empathy: 2, wisdom: 1 } },
     { text: "I’d rather lead than follow", traits: { independence: 2, skills: 1 } }
   ]},
-  { text: "What drives your ambition?", options: [
+  { text: "What drives your ambition.agent?", options: [
     { text: "Making a difference", traits: { empathy: 2, wisdom: 1 } },
     { text: "Achieving personal freedom", traits: { independence: 2, creativity: 1 } },
     { text: "Perfecting my abilities", traits: { skills: 2, wisdom: 1 } },
@@ -197,7 +198,6 @@ function draw() {
 }
 
 function drawLandingPage() {
-  // Gradient background
   for (let i = 0; i < height; i++) {
     let inter = map(i, 0, height, 0, 1);
     let c = lerpColor(color(135, 206, 235), color(255, 182, 193), inter);
@@ -221,7 +221,6 @@ function drawLandingPage() {
     y += 20;
   }
   
-  // Fancy button
   fill(255, 165, 0);
   rect(250, 340, 100, 40, 10);
   fill(255);
@@ -230,7 +229,6 @@ function drawLandingPage() {
 }
 
 function drawQuestion() {
-  // Light blue background
   background(173, 216, 230);
   
   let q = randomizedQuestions[currentQuestion];
@@ -238,23 +236,36 @@ function drawQuestion() {
   textSize(20);
   text(q.text, width / 2, 40);
   
-  // Question tracker
   textSize(14);
   fill(100);
   text(`Question ${currentQuestion + 1} of 10`, width / 2, 70);
   
   for (let i = 0; i < q.options.length; i++) {
     let y = 100 + i * 60;
-    fill(255, 245, 238);
+    fill(answers[currentQuestion] === i ? 255, 215, 0 : 255, 245, 238); // Highlight selected option
     rect(150, y - 20, 300, 40, 5);
     fill(50);
     textSize(16);
     text(q.options[i].text, width / 2, y);
   }
+  
+  // Navigation buttons
+  if (currentQuestion > 0) {
+    fill(100, 149, 237);
+    rect(50, 340, 80, 40, 10);
+    fill(255);
+    textSize(16);
+    text("Previous", 90, 360);
+  }
+  
+  fill(255, 165, 0);
+  rect(470, 340, 80, 40, 10);
+  fill(255);
+  textSize(16);
+  text(currentQuestion === 9 ? "Finish" : "Next", 510, 360);
 }
 
 function drawProgress() {
-  // Gradient background
   for (let i = 0; i < height; i++) {
     let inter = map(i, 0, height, 0, 1);
     let c = lerpColor(color(144, 238, 144), color(255, 215, 0), inter);
@@ -266,7 +277,6 @@ function drawProgress() {
   textSize(24);
   text("Calculating Your Archetype...", width / 2, 150);
   
-  // Progress bar
   let barWidth = map(progress, 0, 100, 0, 400);
   fill(50, 205, 50);
   rect(100, 200, barWidth, 20, 10);
@@ -274,15 +284,14 @@ function drawProgress() {
   textSize(16);
   text(`${floor(progress)}%`, width / 2, 210);
   
-  progress += 2; // Animate progress
+  progress += 2;
   if (progress >= 100) {
     state = 'results';
-    progress = 0; // Reset for next time
+    progress = 0;
   }
 }
 
 function drawResults() {
-  // Soft purple background
   background(221, 160, 221);
   
   let results = calculateArchetypePercentages();
@@ -318,25 +327,49 @@ function mousePressed() {
       randomizedQuestions = shuffleArray([...questions]).slice(0, 10);
       currentQuestion = 0;
       scores = { empathy: 0, skills: 0, independence: 0, wisdom: 0, creativity: 0 };
+      answers = Array(10).fill(-1); // Initialize answers array with -1 (unanswered)
     }
   } else if (state === 'quiz') {
     let q = randomizedQuestions[currentQuestion];
+    
+    // Check for option selection
     for (let i = 0; i < q.options.length; i++) {
       let y = 100 + i * 60;
       if (mouseX > 150 && mouseX < 450 && mouseY > y - 20 && mouseY < y + 20) {
-        let traits = q.options[i].traits;
-        for (let trait in traits) {
-          scores[trait] += traits[trait];
-        }
+        answers[currentQuestion] = i; // Store selected option
+        updateScores(); // Recalculate scores
+      }
+    }
+    
+    // Previous button
+    if (currentQuestion > 0 && mouseX > 50 && mouseX < 130 && mouseY > 340 && mouseY < 380) {
+      currentQuestion--;
+    }
+    
+    // Next/Finish button
+    if (mouseX > 470 && mouseX < 550 && mouseY > 340 && mouseY < 380) {
+      if (currentQuestion < 9) {
         currentQuestion++;
-        if (currentQuestion >= randomizedQuestions.length) {
-          state = 'progress'; // Transition to progress state
-        }
+      } else if (answers.every(a => a !== -1)) { // All questions answered
+        state = 'progress';
       }
     }
   } else if (state === 'results') {
     if (mouseX > 250 && mouseX < 350 && mouseY > 340 && mouseY < 380) {
       shareOnFacebook();
+    }
+  }
+}
+
+function updateScores() {
+  scores = { empathy: 0, skills: 0, independence: 0, wisdom: 0, creativity: 0 }; // Reset scores
+  for (let i = 0; i < answers.length; i++) {
+    if (answers[i] !== -1) { // If question is answered
+      let q = randomizedQuestions[i];
+      let traits = q.options[answers[i]].traits;
+      for (let trait in traits) {
+        scores[trait] += traits[trait];
+      }
     }
   }
 }
