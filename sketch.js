@@ -120,7 +120,7 @@ const questions = [
     { text: "It’s a tool for good", traits: { empathy: 2, wisdom: 1 } },
     { text: "I’d rather lead than follow", traits: { independence: 2, skills: 1 } }
   ]},
-  { text: "What drives your ambition.agent?", options: [
+  { text: "What drives your ambition?", options: [
     { text: "Making a difference", traits: { empathy: 2, wisdom: 1 } },
     { text: "Achieving personal freedom", traits: { independence: 2, creativity: 1 } },
     { text: "Perfecting my abilities", traits: { skills: 2, wisdom: 1 } },
@@ -183,6 +183,7 @@ function setup() {
   createCanvas(600, 400);
   textAlign(CENTER, CENTER);
   textSize(16);
+  console.log("Setup complete"); // Debug log
 }
 
 function draw() {
@@ -242,7 +243,7 @@ function drawQuestion() {
   
   for (let i = 0; i < q.options.length; i++) {
     let y = 100 + i * 60;
-    fill(answers[currentQuestion] === i ? 255, 215, 0 : 255, 245, 238); // Highlight selected option
+    fill(answers[currentQuestion] === i ? [255, 215, 0] : [255, 245, 238]); // Highlight selected option
     rect(150, y - 20, 300, 40, 5);
     fill(50);
     textSize(16);
@@ -321,6 +322,7 @@ function drawResults() {
 }
 
 function mousePressed() {
+  console.log(`Mouse pressed at (${mouseX}, ${mouseY}), state: ${state}`); // Debug log
   if (state === 'landing') {
     if (mouseX > 250 && mouseX < 350 && mouseY > 340 && mouseY < 380) {
       state = 'quiz';
@@ -328,6 +330,7 @@ function mousePressed() {
       currentQuestion = 0;
       scores = { empathy: 0, skills: 0, independence: 0, wisdom: 0, creativity: 0 };
       answers = Array(10).fill(-1); // Initialize answers array with -1 (unanswered)
+      console.log("Quiz started, questions randomized:", randomizedQuestions);
     }
   } else if (state === 'quiz') {
     let q = randomizedQuestions[currentQuestion];
@@ -338,20 +341,26 @@ function mousePressed() {
       if (mouseX > 150 && mouseX < 450 && mouseY > y - 20 && mouseY < y + 20) {
         answers[currentQuestion] = i; // Store selected option
         updateScores(); // Recalculate scores
+        console.log(`Answer selected for Q${currentQuestion + 1}: ${q.options[i].text}`);
       }
     }
     
     // Previous button
     if (currentQuestion > 0 && mouseX > 50 && mouseX < 130 && mouseY > 340 && mouseY < 380) {
       currentQuestion--;
+      console.log(`Moved to previous question: ${currentQuestion + 1}`);
     }
     
     // Next/Finish button
     if (mouseX > 470 && mouseX < 550 && mouseY > 340 && mouseY < 380) {
       if (currentQuestion < 9) {
         currentQuestion++;
+        console.log(`Moved to next question: ${currentQuestion + 1}`);
       } else if (answers.every(a => a !== -1)) { // All questions answered
         state = 'progress';
+        console.log("All questions answered, moving to progress");
+      } else {
+        console.log("Cannot finish: some questions unanswered", answers);
       }
     }
   } else if (state === 'results') {
@@ -372,6 +381,7 @@ function updateScores() {
       }
     }
   }
+  console.log("Updated scores:", scores); // Debug log
 }
 
 function calculateArchetypePercentages() {
@@ -392,9 +402,10 @@ function calculateArchetypePercentages() {
       similarity += Math.abs(archetype.traits[trait] - normalized[trait]);
     }
     let percentage = (1 - similarity / 2) * 100;
-    return { name: archetype.name, percentage: max(0, percentage.toFixed(1)) };
+    return { name: archetype.name, percentage: Math.max(0, percentage.toFixed(1)) };
   });
   
+  console.log("Calculated archetypes:", results); // Debug log
   return results.sort((a, b) => b.percentage - a.percentage);
 }
 
@@ -414,4 +425,5 @@ function shareOnFacebook() {
   let facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(quizUrl)}&quote=${encodeURIComponent(shareText)}`;
   
   window.open(facebookUrl, '_blank');
+  console.log("Sharing to Facebook:", facebookUrl); // Debug log
 }
