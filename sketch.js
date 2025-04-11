@@ -91,6 +91,7 @@ function setup() {
   let canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.parent('quiz-container');
   textAlign(CENTER, CENTER);
+  textFont('Arial'); // Use Arial as a fallback for Helvetica Neue
   console.log("Setup complete, canvas created with size:", canvasWidth, "x", canvasHeight);
 }
 
@@ -105,28 +106,28 @@ function updateCanvasSize() {
     // Mobile
     canvasWidth = windowWidth - 20;
     canvasHeight = windowHeight * 0.85;
-    fontSizeLarge = canvasWidth * 0.08;
-    fontSizeMedium = canvasWidth * 0.05;
-    fontSizeSmall = canvasWidth * 0.035;
+    fontSizeLarge = 20; // Scaled down from 24px for mobile
+    fontSizeMedium = 14; // Scaled down from 16px
+    fontSizeSmall = 12; // Scaled down from 14px
     buttonWidth = canvasWidth * 0.5;
-    buttonHeight = canvasHeight * 0.1;
-    buttonSpacing = canvasWidth * 0.06;
+    buttonHeight = canvasHeight * 0.08;
+    buttonSpacing = canvasWidth * 0.04;
   } else {
     // Desktop
     canvasWidth = 600;
     canvasHeight = 400;
-    fontSizeLarge = 36;
-    fontSizeMedium = 20;
-    fontSizeSmall = 14;
-    buttonWidth = 200;
-    buttonHeight = 50;
-    buttonSpacing = 25;
+    fontSizeLarge = 24; // Facebook title size
+    fontSizeMedium = 16; // Facebook subtitle/button size
+    fontSizeSmall = 14; // Facebook body text size
+    buttonWidth = 180;
+    buttonHeight = 40;
+    buttonSpacing = 20;
   }
 }
 
 function draw() {
   if (!questionsLoaded && questions.length === 0) {
-    drawGradientBackground();
+    drawBackground();
     fill(255);
     textSize(fontSizeMedium);
     text("Loading questions...", width / 2, height / 2);
@@ -178,39 +179,38 @@ function draw() {
   }
 }
 
-function drawGradientBackground() {
-  for (let i = 0; i < height; i++) {
-    let inter = map(i, 0, height, 0, 1);
-    let c = lerpColor(color(110, 72, 170), color(157, 80, 187), inter);
-    stroke(c);
-    line(0, i, width, i);
-  }
+function drawBackground() {
+  // Facebook-inspired light gray background
+  background(240, 242, 245); // #F0F2F5
+
+  // Draw a white card-like overlay for content
+  fill(255);
+  noStroke();
+  rect(width * 0.05, height * 0.05, width * 0.9, height * 0.9, 10);
 }
 
 function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
-  // Adjust colors based on hover and press states
   let startColor = c1;
   let endColor = c2;
   let scaleFactor = 1.0;
   if (isPressed && mouseIsPressed) {
-    startColor = color(red(c1) * 0.8, green(c1) * 0.8, blue(c1) * 0.8);
-    endColor = color(red(c2) * 0.8, green(c2) * 0.8, blue(c2) * 0.8);
-    scaleFactor = 0.95;
+    startColor = color(red(c1) * 0.9, green(c1) * 0.9, blue(c1) * 0.9);
+    endColor = color(red(c2) * 0.9, green(c2) * 0.9, blue(c2) * 0.9);
+    scaleFactor = 0.98;
   } else if (isHovered) {
     startColor = color(red(c1) * 1.1, green(c1) * 1.1, blue(c1) * 1.1);
     endColor = color(red(c2) * 1.1, green(c2) * 1.1, blue(c2) * 1.1);
-    scaleFactor = 1.05;
+    scaleFactor = 1.02;
   }
 
-  // Apply scaling for hover/pressed effect
   push();
   translate(x + w / 2, y + h / 2);
   scale(scaleFactor);
   translate(-(x + w / 2), -(y + h / 2));
 
   // Add shadow
-  drawingContext.shadowBlur = 15;
-  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  drawingContext.shadowBlur = 4;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.1)';
 
   // Draw gradient
   for (let i = 0; i < h; i++) {
@@ -220,11 +220,11 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
     line(x, y + i, x + w, y + i);
   }
 
-  // Draw border
+  // Draw border (Facebook buttons have no visible border, but a slight shadow)
   noFill();
-  stroke(255, 255, 255, 200);
-  strokeWeight(2);
-  rect(x, y, w, h, 15);
+  stroke(0, 0, 0, 0);
+  strokeWeight(0);
+  rect(x, y, w, h, 4); // Facebook button border radius
 
   // Reset stroke and shadow
   noStroke();
@@ -232,7 +232,7 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
 
   // Draw text
   fill(255);
-  textSize(fontSizeMedium * 1.2);
+  textSize(fontSizeMedium);
   textStyle(BOLD);
   text(text, x + w / 2, y + h / 2);
 
@@ -240,21 +240,21 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
 }
 
 function drawLandingPage() {
-  drawGradientBackground();
+  drawBackground();
 
-  drawingContext.shadowBlur = 5;
-  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
+  drawingContext.shadowBlur = 2;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.1)';
 
   // Title
-  fill(255, 245, 255);
+  fill(28, 37, 38); // #1C2526
   textSize(fontSizeLarge);
   textStyle(BOLD);
   text("Discover Your Male Archetype", width / 2, height * 0.2);
 
-  // Gradient underline for title
-  for (let i = 0; i < 5; i++) {
-    let inter = map(i, 0, 5, 0, 1);
-    let c = lerpColor(color(255, 105, 180), color(255, 150, 200), inter);
+  // Underline with Facebook blue gradient
+  for (let i = 0; i < 3; i++) {
+    let inter = map(i, 0, 3, 0, 1);
+    let c = lerpColor(color(24, 119, 242), color(66, 165, 245), inter); // #1877F2 to #42A5F5
     stroke(c);
     strokeWeight(2);
     line(width * 0.3, height * 0.25 + i, width * 0.7, height * 0.25 + i);
@@ -262,7 +262,7 @@ function drawLandingPage() {
   noStroke();
 
   // Subtitle
-  fill(220, 200, 255);
+  fill(101, 103, 107); // #65676B
   textSize(fontSizeMedium);
   textStyle(NORMAL);
   text("Explore 12 universal patterns of masculinity", width / 2, height * 0.32);
@@ -272,28 +272,28 @@ function drawLandingPage() {
   let y = height * 0.4;
   const teaserArchetypes = archetypes.slice(0, 3);
   for (let archetype of teaserArchetypes) {
-    fill(200, 180, 255);
+    fill(101, 103, 107); // #65676B
     text(`${archetype.name}: ${archetype.desc}`, width / 2, y);
     y += fontSizeSmall * 2.5;
   }
 
   // Add a "See all archetypes" hint
-  fill(180, 160, 240);
+  fill(101, 103, 107); // #65676B
   textSize(fontSizeSmall * 0.9);
   text("...and 9 more archetypes to discover!", width / 2, y);
 
   // Start Quiz button
   let buttonX = width / 2 - buttonWidth / 2;
   let buttonY = height * 0.75;
-  let c1 = color(255, 105, 180);
-  let c2 = color(255, 150, 200);
+  let c1 = color(24, 119, 242); // #1877F2
+  let c2 = color(66, 165, 245); // #42A5F5
   drawButton(buttonX, buttonY, buttonWidth, buttonHeight, "Start Quiz", c1, c2, buttonPressed.start, buttonHovered.start);
 
   drawingContext.shadowBlur = 0;
 }
 
 function drawQuestion() {
-  drawGradientBackground();
+  drawBackground();
 
   let q = randomizedQuestions[currentQuestion];
   if (!q) {
@@ -302,15 +302,15 @@ function drawQuestion() {
     return;
   }
 
-  drawingContext.shadowBlur = 5;
-  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
+  drawingContext.shadowBlur = 2;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.1)';
 
-  fill(255, 245, 255);
+  fill(28, 37, 38); // #1C2526
   textSize(fontSizeLarge);
   text(q.text, width / 2, height * 0.12);
 
   textSize(fontSizeSmall);
-  fill(200, 180, 255);
+  fill(101, 103, 107); // #65676B
   text(`Question ${currentQuestion + 1} of 10`, width / 2, height * 0.20);
 
   let optionYStart = height * 0.28;
@@ -319,12 +319,12 @@ function drawQuestion() {
     let optionWidth = width * 0.8;
     let optionX = (width - optionWidth) / 2;
 
-    let fillColor = answers[currentQuestion] === i ? [220, 190, 255] : [255, 255, 255, 200];
+    let fillColor = answers[currentQuestion] === i ? [200, 220, 255] : [240, 242, 245]; // Selected: light blue, Unselected: #F0F2F5
     fill(fillColor);
     noStroke();
-    rect(optionX, y - buttonHeight / 2, optionWidth, buttonHeight, 10);
+    rect(optionX, y - buttonHeight / 2, optionWidth, buttonHeight, 4);
 
-    fill(60, 40, 80);
+    fill(28, 37, 38); // #1C2526
     textSize(fontSizeMedium);
     text(q.options[i].text, width / 2, y);
   }
@@ -332,35 +332,35 @@ function drawQuestion() {
   let navButtonY = height * 0.80;
 
   if (currentQuestion > 0) {
-    let c1 = color(130, 90, 190);
-    let c2 = color(170, 130, 230);
+    let c1 = color(24, 119, 242); // #1877F2
+    let c2 = color(66, 165, 245); // #42A5F5
     drawButton(30, navButtonY, buttonWidth, buttonHeight, "Previous", c1, c2, buttonPressed.prev, buttonHovered.prev);
   }
 
-  let c1 = color(190, 120, 220);
-  let c2 = color(230, 160, 255);
+  let c1 = color(24, 119, 242); // #1877F2
+  let c2 = color(66, 165, 245); // #42A5F5
   drawButton(width - buttonWidth - 30, navButtonY, buttonWidth, buttonHeight, currentQuestion === 9 ? "Finish" : "Next", c1, c2, buttonPressed.next, buttonHovered.next);
 
   drawingContext.shadowBlur = 0;
 }
 
 function drawProgress() {
-  drawGradientBackground();
+  drawBackground();
 
-  drawingContext.shadowBlur = 5;
-  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
+  drawingContext.shadowBlur = 2;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.1)';
 
-  fill(255, 245, 255);
+  fill(28, 37, 38); // #1C2526
   textSize(fontSizeLarge);
   text("Calculating Your Archetype...", width / 2, height * 0.35);
 
   let barWidth = map(progress, 0, 100, 0, width * 0.8);
   let barX = (width - barWidth) / 2;
-  fill(170, 130, 230);
+  fill(24, 119, 242); // #1877F2
   noStroke();
-  rect(barX, height * 0.45, barWidth, 20, 10);
+  rect(barX, height * 0.45, barWidth, 20, 4);
 
-  fill(255, 245, 255);
+  fill(28, 37, 38); // #1C2526
   textSize(fontSizeMedium);
   text(`${floor(progress)}%`, width / 2, height * 0.45 + 10);
 
@@ -375,19 +375,19 @@ function drawProgress() {
 }
 
 function drawResults() {
-  drawGradientBackground();
+  drawBackground();
 
   if (!archetypeResults) {
     console.error("Archetype results not calculated yet");
     return;
   }
 
-  drawingContext.shadowBlur = 5;
-  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
+  drawingContext.shadowBlur = 2;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.1)';
 
   let topArchetype = archetypeResults[0];
 
-  fill(255, 245, 255);
+  fill(28, 37, 38); // #1C2526
   textSize(fontSizeLarge);
   textStyle(BOLD);
   text(`You are a ${topArchetype.name}!`, width / 2, height * 0.15);
@@ -399,18 +399,16 @@ function drawResults() {
   textSize(fontSizeSmall);
   let y = height * 0.32;
   for (let i = 1; i < archetypeResults.length; i++) {
-    fill(200, 180, 255);
+    fill(101, 103, 107); // #65676B
     text(`${archetypeResults[i].name}: ${archetypeResults[i].percentage}%`, width / 2, y);
     y += fontSizeSmall * 1.8;
   }
 
   let shareButtonY = height * 0.65;
-  let c1 = color(130, 90, 190);
-  let c2 = color(170, 130, 230);
+  let c1 = color(24, 119, 242); // #1877F2
+  let c2 = color(66, 165, 245); // #42A5F5
   drawButton(width / 2 - buttonWidth - buttonSpacing / 2, shareButtonY, buttonWidth, buttonHeight, "Share on FB", c1, c2, buttonPressed.fb, buttonHovered.fb);
 
-  c1 = color(190, 120, 220);
-  c2 = color(230, 160, 255);
   drawButton(width / 2 + buttonSpacing / 2, shareButtonY, buttonWidth, buttonHeight, "Share on X", c1, c2, buttonPressed.twitter, buttonHovered.twitter);
 
   drawingContext.shadowBlur = 0;
@@ -443,7 +441,6 @@ function mousePressed() {
         console.log("Quiz started, questions randomized:", randomizedQuestions);
       } else {
         console.error("Cannot start quiz: no questions available", questions);
-        // Fallback to ensure the quiz can start even if questions.json fails
         questions = fallbackQuestions;
         state = 'quiz';
         randomizedQuestions = shuffleArray([...questions]).slice(0, 10);
