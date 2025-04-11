@@ -105,20 +105,20 @@ function updateCanvasSize() {
     // Mobile
     canvasWidth = windowWidth - 20;
     canvasHeight = windowHeight * 0.85;
-    fontSizeLarge = canvasWidth * 0.08; // Increased for better readability
+    fontSizeLarge = canvasWidth * 0.08;
     fontSizeMedium = canvasWidth * 0.05;
     fontSizeSmall = canvasWidth * 0.035;
-    buttonWidth = canvasWidth * 0.5; // Wider button for better CTA
+    buttonWidth = canvasWidth * 0.5;
     buttonHeight = canvasHeight * 0.1;
     buttonSpacing = canvasWidth * 0.06;
   } else {
     // Desktop
     canvasWidth = 600;
     canvasHeight = 400;
-    fontSizeLarge = 36; // Increased for better readability
+    fontSizeLarge = 36;
     fontSizeMedium = 20;
     fontSizeSmall = 14;
-    buttonWidth = 200; // Wider button for better CTA
+    buttonWidth = 200;
     buttonHeight = 50;
     buttonSpacing = 25;
   }
@@ -144,9 +144,10 @@ function draw() {
   // Check for hover states
   if (state === 'landing') {
     let buttonX = width / 2 - buttonWidth / 2;
-    let buttonY = height * 0.75; // Adjusted position
+    let buttonY = height * 0.75;
     if (mouseX > buttonX && mouseX < buttonX + buttonWidth && mouseY > buttonY && mouseY < buttonY + buttonHeight) {
       buttonHovered.start = true;
+      console.log("Hovering over Start Quiz button");
     }
   } else if (state === 'quiz') {
     let navButtonY = height * 0.8;
@@ -231,7 +232,7 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
 
   // Draw text
   fill(255);
-  textSize(fontSizeMedium * 1.2); // Increased text size for better readability
+  textSize(fontSizeMedium * 1.2);
   textStyle(BOLD);
   text(text, x + w / 2, y + h / 2);
 
@@ -269,11 +270,11 @@ function drawLandingPage() {
   // Show only a few archetypes as a teaser
   textSize(fontSizeSmall);
   let y = height * 0.4;
-  const teaserArchetypes = archetypes.slice(0, 3); // Show only first 3
+  const teaserArchetypes = archetypes.slice(0, 3);
   for (let archetype of teaserArchetypes) {
     fill(200, 180, 255);
     text(`${archetype.name}: ${archetype.desc}`, width / 2, y);
-    y += fontSizeSmall * 2.5; // Increased spacing
+    y += fontSizeSmall * 2.5;
   }
 
   // Add a "See all archetypes" hint
@@ -284,8 +285,8 @@ function drawLandingPage() {
   // Start Quiz button
   let buttonX = width / 2 - buttonWidth / 2;
   let buttonY = height * 0.75;
-  let c1 = color(255, 105, 180); // Hot pink
-  let c2 = color(255, 150, 200); // Lighter pink
+  let c1 = color(255, 105, 180);
+  let c2 = color(255, 150, 200);
   drawButton(buttonX, buttonY, buttonWidth, buttonHeight, "Start Quiz", c1, c2, buttonPressed.start, buttonHovered.start);
 
   drawingContext.shadowBlur = 0;
@@ -418,7 +419,7 @@ function drawResults() {
 function mousePressed() {
   let currentTime = millis();
   if (currentTime - lastClickTime < CLICK_DEBOUNCE) {
-    console.log("Click debounced");
+    console.log("Click debounced, time since last click:", currentTime - lastClickTime);
     return;
   }
   lastClickTime = currentTime;
@@ -428,8 +429,11 @@ function mousePressed() {
   if (state === 'landing') {
     let buttonX = width / 2 - buttonWidth / 2;
     let buttonY = height * 0.75;
+    console.log(`Start Quiz button bounds: x(${buttonX}, ${buttonX + buttonWidth}), y(${buttonY}, ${buttonY + buttonHeight})`);
     if (mouseX > buttonX && mouseX < buttonX + buttonWidth && mouseY > buttonY && mouseY < buttonY + buttonHeight) {
+      console.log("Start Quiz button clicked");
       buttonPressed.start = true;
+      console.log("Questions array length:", questions.length);
       if (questions.length > 0) {
         state = 'quiz';
         randomizedQuestions = shuffleArray([...questions]).slice(0, 10);
@@ -438,8 +442,18 @@ function mousePressed() {
         answers = Array(10).fill(-1);
         console.log("Quiz started, questions randomized:", randomizedQuestions);
       } else {
-        console.log("Cannot start quiz: no questions available", questions);
+        console.error("Cannot start quiz: no questions available", questions);
+        // Fallback to ensure the quiz can start even if questions.json fails
+        questions = fallbackQuestions;
+        state = 'quiz';
+        randomizedQuestions = shuffleArray([...questions]).slice(0, 10);
+        currentQuestion = 0;
+        scores = { empathy: 0, skills: 0, independence: 0, wisdom: 0, creativity: 0 };
+        answers = Array(10).fill(-1);
+        console.log("Quiz started with fallback questions:", randomizedQuestions);
       }
+    } else {
+      console.log("Click outside Start Quiz button bounds");
     }
   } else if (state === 'quiz') {
     let q = randomizedQuestions[currentQuestion];
