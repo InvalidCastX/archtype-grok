@@ -227,7 +227,14 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
 
   // Draw the text separately, ensuring no transformations affect it
   push();
-  fill(255); // White text
+  //fill(255); // White text
+
+  fill(0, 0, 0, 40); // Slight shadow for better visibility
+text(text, x + w / 2 + 1, y + h / 2 + 1); // Shadow offset
+fill(255); // Main white text
+text(text, x + w / 2, y + h / 2);
+
+  
   textSize(fontSizeMedium * 1.2);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
