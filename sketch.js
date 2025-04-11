@@ -420,10 +420,10 @@ function shuffleArray(array) {
 function shareOnFacebook() {
   let results = calculateArchetypePercentages();
   let topArchetype = results[0].name;
-  let shareText = `I took the Archetype Quiz and discovered I'm a ${topArchetype}! Find out your archetype here:`;
+  let shareText = `I discovered I'm a ${topArchetype} in the Archetype Quiz! Find out your archetype here:`;
   let quizUrl = `https://archtype-grok.vercel.app/?archetype=${encodeURIComponent(topArchetype)}`;
   let facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(quizUrl)}&quote=${encodeURIComponent(shareText)}`;
   
   window.open(facebookUrl, '_blank');
-  console.log("Sharing to Facebook:", facebookUrl); // Debug log
+  console.log("Sharing to Facebook:", facebookUrl);
 }
