@@ -13,11 +13,20 @@ let randomizedQuestions = [];
 let answers = []; // Array to store user answers (index of selected option per question)
 let progress = 0; // For progress bar animation
 let lastClickTime = 0; // Debounce variable
-const CLICK_DEBOUNCE = 300; // Increased to 300ms for stricter debounce
+const CLICK_DEBOUNCE = 300; // Debounce for touch/click events
 let questions = []; // Will be loaded from questions.json
 let questionsLoaded = false; // Flag to track if questions are loaded
 let archetypeResults = null; // Store the calculated archetype results
 
+// Responsive variables
+let canvasWidth, canvasHeight;
+let fontSizeLarge, fontSizeMedium, fontSizeSmall;
+let buttonWidth, buttonHeight, buttonSpacing;
+
+// Track button press for visual feedback
+let buttonPressed = { start: false, prev: false, next: false, fb: false, twitter: false };
+
+// Define archetypes
 const archetypes = [
   { name: "King", desc: "Balanced leadership with wisdom and independence.", traits: { wisdom: 0.4, independence: 0.3, empathy: 0.1, skills: 0.1, creativity: 0.1 } },
   { name: "Father", desc: "Nurturing and guiding with wisdom and skills.", traits: { wisdom: 0.4, skills: 0.3, empathy: 0.2, independence: 0.1, creativity: 0.0 } },
@@ -37,7 +46,7 @@ const archetypes = [
 function preload() {
   console.log("Preloading questions.json");
   loadJSON("questions.json", (loadedQuestions) => {
-    questions = loadedQuestions; // Assign the loaded data to questions
+    questions = loadedQuestions;
     console.log("questions.json loaded successfully", questions);
     if (Array.isArray(questions) && questions.length > 0) {
       questionsLoaded = true;
@@ -53,17 +62,47 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(600, 400);
+  updateCanvasSize();
+  let canvas = createCanvas(canvasWidth, canvasHeight);
+  canvas.parent('quiz-container'); // Attach to the container in index.html
   textAlign(CENTER, CENTER);
-  textSize(16);
   console.log("Setup complete");
 }
 
+function windowResized() {
+  updateCanvasSize();
+  resizeCanvas(canvasWidth, canvasHeight);
+}
+
+function updateCanvasSize() {
+  if (windowWidth <= 600) {
+    // Mobile
+    canvasWidth = windowWidth - 20;
+    canvasHeight = windowHeight * 0.85;
+    fontSizeLarge = canvasWidth * 0.08;
+    fontSizeMedium = canvasWidth * 0.05;
+    fontSizeSmall = canvasWidth * 0.035;
+    buttonWidth = canvasWidth * 0.35;
+    buttonHeight = canvasHeight * 0.12;
+    buttonSpacing = canvasWidth * 0.05;
+  } else {
+    // Desktop
+    canvasWidth = 600;
+    canvasHeight = 400;
+    fontSizeLarge = 32;
+    fontSizeMedium = 18;
+    fontSizeSmall = 14;
+    buttonWidth = 120;
+    buttonHeight = 50;
+    buttonSpacing = 20;
+  }
+}
+
 function draw() {
-  // Add a loading screen if questions are not loaded
   if (!questionsLoaded || !Array.isArray(questions) || questions.length === 0) {
-    background(220);
-    fill(0);
+    background(255, 255, 255, 50);
+    fill(255);
+    textSize(fontSizeMedium);
     text("Loading questions...", width / 2, height / 2);
     return;
   }
@@ -80,168 +119,257 @@ function draw() {
 }
 
 function drawLandingPage() {
-  for (let i = 0; i < height; i++) {
-    let inter = map(i, 0, height, 0, 1);
-    let c = lerpColor(color(135, 206, 235), color(255, 182, 193), inter);
-    stroke(c);
-    line(0, i, width, i);
-  }
-  
+  // Semi-transparent background
+  background(255, 255, 255, 50);
+
+  // Add shadow to text
+  drawingContext.shadowBlur = 5;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
+
+  // Title
   fill(255);
-  textSize(28);
+  textSize(fontSizeLarge);
   textStyle(BOLD);
-  text("Discover Your Male Archetype", width / 2, 40);
-  textSize(16);
+  text("Discover Your Male Archetype", width / 2, height * 0.15);
+
+  // Subtitle
+  textSize(fontSizeMedium);
   textStyle(NORMAL);
-  text("Explore 12 universal patterns of masculinity", width / 2, 70);
-  
-  let y = 100;
-  textSize(14);
+  text("Explore 12 universal patterns", width / 2, height * 0.25);
+
+  // Archetype list
+  textSize(fontSizeSmall);
+  let y = height * 0.35;
   for (let archetype of archetypes) {
-    fill(50);
+    fill(220);
     text(`${archetype.name}: ${archetype.desc}`, width / 2, y);
-    y += 20;
+    y += fontSizeSmall * 1.5;
   }
-  
-  // Show "Start Quiz" button only if questions are loaded
-  if (questionsLoaded) {
-    fill(255, 165, 0);
-    rect(250, 340, 100, 40, 10);
-    fill(255);
-    textSize(18);
-    text("Start Quiz", 300, 360);
-  } else {
-    fill(150);
-    rect(250, 340, 100, 40, 10);
-    fill(255);
-    textSize(18);
-    text("Loading...", 300, 360);
+
+  // Start Quiz button with gradient
+  let buttonX = width / 2 - buttonWidth / 2;
+  let buttonY = height * 0.75;
+  let c1 = color(120, 81, 169); // Purple
+  let c2 = color(157, 80, 187); // Lighter purple
+  if (buttonPressed.start && mouseIsPressed) {
+    c1 = color(100, 61, 149); // Darker shade when pressed
+    c2 = color(137, 60, 167);
   }
+  for (let i = 0; i < buttonHeight; i++) {
+    let inter = map(i, 0, buttonHeight, 0, 1);
+    let c = lerpColor(c1, c2, inter);
+    stroke(c);
+    line(buttonX, buttonY + i, buttonX + buttonWidth, buttonY + i);
+  }
+  noStroke();
+  fill(255);
+  textSize(fontSizeMedium);
+  text("Start Quiz", width / 2, buttonY + buttonHeight / 2);
+
+  drawingContext.shadowBlur = 0;
 }
 
 function drawQuestion() {
-  background(173, 216, 230);
-  
+  background(255, 255, 255, 50);
+
   let q = randomizedQuestions[currentQuestion];
   if (!q) {
     console.error("Question is undefined at index", currentQuestion, "randomizedQuestions:", randomizedQuestions);
-    state = 'landing'; // Reset to landing page if there's an error
+    state = 'landing';
     return;
   }
-  
-  fill(50);
-  textSize(20);
-  text(q.text, width / 2, 40);
-  
-  textSize(14);
-  fill(100);
-  text(`Question ${currentQuestion + 1} of 10`, width / 2, 70);
-  
+
+  drawingContext.shadowBlur = 5;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
+
+  // Question text
+  fill(255);
+  textSize(fontSizeLarge);
+  text(q.text, width / 2, height * 0.15);
+
+  // Question number
+  textSize(fontSizeSmall);
+  fill(220);
+  text(`Question ${currentQuestion + 1} of 10`, width / 2, height * 0.25);
+
+  // Options
+  let optionYStart = height * 0.35;
   for (let i = 0; i < q.options.length; i++) {
-    let y = 100 + i * 60;
-    // Determine the color based on whether the option is selected
-    let fillColor = answers[currentQuestion] === i ? [255, 215, 0] : [255, 245, 238];
-    fill(fillColor[0], fillColor[1], fillColor[2]); // Set the fill color
-    rect(150, y - 20, 300, 40, 5);
+    let y = optionYStart + i * (buttonHeight + buttonSpacing);
+    let optionWidth = width * 0.8;
+    let optionX = (width - optionWidth) / 2;
+
+    // Highlight selected option
+    let fillColor = answers[currentQuestion] === i ? [220, 190, 255] : [255, 255, 255, 200];
+    fill(fillColor);
+    noStroke();
+    rect(optionX, y - buttonHeight / 2, optionWidth, buttonHeight, 10);
+
+    // Option text
     fill(50);
-    textSize(16);
+    textSize(fontSizeMedium);
     text(q.options[i].text, width / 2, y);
   }
-  
+
   // Navigation buttons
+  let navButtonY = height * 0.85;
+
   if (currentQuestion > 0) {
-    fill(100, 149, 237);
-    rect(50, 340, 80, 40, 10);
+    let c1 = color(100, 149, 237); // Blue
+    let c2 = color(135, 206, 250);
+    if (buttonPressed.prev && mouseIsPressed) {
+      c1 = color(80, 129, 217);
+      c2 = color(115, 186, 230);
+    }
+    for (let i = 0; i < buttonHeight; i++) {
+      let inter = map(i, 0, buttonHeight, 0, 1);
+      let c = lerpColor(c1, c2, inter);
+      stroke(c);
+      line(20, navButtonY + i, 20 + buttonWidth, navButtonY + i);
+    }
+    noStroke();
     fill(255);
-    textSize(16);
-    text("Previous", 90, 360);
+    textSize(fontSizeMedium);
+    text("Previous", 20 + buttonWidth / 2, navButtonY + buttonHeight / 2);
   }
-  
-  fill(255, 165, 0);
-  rect(470, 340, 80, 40, 10);
+
+  let c1 = color(255, 165, 0); // Orange
+  let c2 = color(255, 215, 0);
+  if (buttonPressed.next && mouseIsPressed) {
+    c1 = color(235, 145, 0);
+    c2 = color(235, 195, 0);
+  }
+  for (let i = 0; i < buttonHeight; i++) {
+    let inter = map(i, 0, buttonHeight, 0, 1);
+    let c = lerpColor(c1, c2, inter);
+    stroke(c);
+    line(width - buttonWidth - 20, navButtonY + i, width - 20, navButtonY + i);
+  }
+  noStroke();
   fill(255);
-  textSize(16);
-  text(currentQuestion === 9 ? "Finish" : "Next", 510, 360);
+  textSize(fontSizeMedium);
+  text(currentQuestion === 9 ? "Finish" : "Next", width - buttonWidth / 2 - 20, navButtonY + buttonHeight / 2);
+
+  drawingContext.shadowBlur = 0;
 }
 
 function drawProgress() {
-  for (let i = 0; i < height; i++) {
-    let inter = map(i, 0, height, 0, 1);
-    let c = lerpColor(color(144, 238, 144), color(255, 215, 0), inter);
-    stroke(c);
-    line(0, i, width, i);
-  }
-  
+  background(255, 255, 255, 50);
+
+  drawingContext.shadowBlur = 5;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
+
   fill(255);
-  textSize(24);
-  text("Calculating Your Archetype...", width / 2, 150);
-  
-  let barWidth = map(progress, 0, 100, 0, 400);
+  textSize(fontSizeLarge);
+  text("Calculating Your Archetype...", width / 2, height * 0.4);
+
+  let barWidth = map(progress, 0, 100, 0, width * 0.8);
+  let barX = (width - barWidth) / 2;
   fill(50, 205, 50);
-  rect(100, 200, barWidth, 20, 10);
+  noStroke();
+  rect(barX, height * 0.5, barWidth, 20, 10);
+
   fill(255);
-  textSize(16);
-  text(`${floor(progress)}%`, width / 2, 210);
-  
+  textSize(fontSizeMedium);
+  text(`${floor(progress)}%`, width / 2, height * 0.5 + 10);
+
   progress += 2;
   if (progress >= 100) {
-    archetypeResults = calculateArchetypePercentages(); // Calculate results once
+    archetypeResults = calculateArchetypePercentages();
     state = 'results';
     progress = 0;
   }
+
+  drawingContext.shadowBlur = 0;
 }
 
 function drawResults() {
-  background(221, 160, 221);
-  
+  background(255, 255, 255, 50);
+
   if (!archetypeResults) {
     console.error("Archetype results not calculated yet");
     return;
   }
-  
+
+  drawingContext.shadowBlur = 5;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
+
   let topArchetype = archetypeResults[0];
-  
+
   fill(255);
-  textSize(36);
+  textSize(fontSizeLarge);
   textStyle(BOLD);
-  text(`You are a ${topArchetype.name}!`, width / 2, 100);
-  textSize(18);
+  text(`You are a ${topArchetype.name}!`, width / 2, height * 0.2);
+
+  textSize(fontSizeMedium);
   textStyle(NORMAL);
-  text(`${topArchetype.percentage}% match`, width / 2, 140);
-  
-  textSize(12);
-  let y = 180;
+  text(`${topArchetype.percentage}% match`, width / 2, height * 0.3);
+
+  textSize(fontSizeSmall);
+  let y = height * 0.4;
   for (let i = 1; i < archetypeResults.length; i++) {
-    fill(100);
+    fill(220);
     text(`${archetypeResults[i].name}: ${archetypeResults[i].percentage}%`, width / 2, y);
-    y += 20;
+    y += fontSizeSmall * 1.5;
   }
-  
-  fill(255, 69, 0);
-  rect(250, 340, 100, 40, 10);
+
+  let shareButtonY = height * 0.75;
+  let c1 = color(59, 89, 152); // Facebook blue
+  let c2 = color(120, 139, 192);
+  if (buttonPressed.fb && mouseIsPressed) {
+    c1 = color(39, 69, 132);
+    c2 = color(100, 119, 172);
+  }
+  for (let i = 0; i < buttonHeight; i++) {
+    let inter = map(i, 0, buttonHeight, 0, 1);
+    let c = lerpColor(c1, c2, inter);
+    stroke(c);
+    line(width / 2 - buttonWidth - buttonSpacing / 2, shareButtonY + i, width / 2 - buttonSpacing / 2, shareButtonY + i);
+  }
+
+  c1 = color(29, 161, 242); // Twitter blue
+  c2 = color(79, 191, 252);
+  if (buttonPressed.twitter && mouseIsPressed) {
+    c1 = color(9, 141, 222);
+    c2 = color(59, 171, 232);
+  }
+  for (let i = 0; i < buttonHeight; i++) {
+    let inter = map(i, 0, buttonHeight, 0, 1);
+    let c = lerpColor(c1, c2, inter);
+    stroke(c);
+    line(width / 2 + buttonSpacing / 2, shareButtonY + i, width / 2 + buttonWidth + buttonSpacing / 2, shareButtonY + i);
+  }
+
+  noStroke();
   fill(255);
-  textSize(18);
-  text("Share on FB", 300, 360);
+  textSize(fontSizeMedium);
+  text("Share on FB", width / 2 - buttonWidth / 2 - buttonSpacing / 2, shareButtonY + buttonHeight / 2);
+  text("Share on X", width / 2 + buttonWidth / 2 + buttonSpacing / 2, shareButtonY + buttonHeight / 2);
+
+  drawingContext.shadowBlur = 0;
 }
 
 function mousePressed() {
   let currentTime = millis();
   if (currentTime - lastClickTime < CLICK_DEBOUNCE) {
     console.log("Click debounced");
-    return; // Debounce clicks
+    return;
   }
   lastClickTime = currentTime;
-  
+
   console.log(`Mouse pressed at (${mouseX}, ${mouseY}), state: ${state}, currentQuestion: ${currentQuestion}`);
 
   if (state === 'landing') {
-    if (mouseX > 250 && mouseX < 350 && mouseY > 340 && mouseY < 380) {
+    let buttonX = width / 2 - buttonWidth / 2;
+    let buttonY = height * 0.75;
+    if (mouseX > buttonX && mouseX < buttonX + buttonWidth && mouseY > buttonY && mouseY < buttonY + buttonHeight) {
+      buttonPressed.start = true;
       if (questionsLoaded && Array.isArray(questions) && questions.length > 0) {
         state = 'quiz';
         randomizedQuestions = shuffleArray([...questions]).slice(0, 10);
         currentQuestion = 0;
         scores = { empathy: 0, skills: 0, independence: 0, wisdom: 0, creativity: 0 };
-        answers = Array(10).fill(-1); // Initialize answers array with -1 (unanswered)
+        answers = Array(10).fill(-1);
         console.log("Quiz started, questions randomized:", randomizedQuestions);
       } else {
         console.log("Cannot start quiz: questions not yet loaded or invalid", questions);
@@ -249,33 +377,36 @@ function mousePressed() {
     }
   } else if (state === 'quiz') {
     let q = randomizedQuestions[currentQuestion];
-    
+
     // Handle option selection
     let optionSelected = false;
+    let optionYStart = height * 0.35;
     for (let i = 0; i < q.options.length; i++) {
-      let y = 100 + i * 60;
-      if (mouseX > 150 && mouseX < 450 && mouseY > y - 20 && mouseY < y + 20) {
-        answers[currentQuestion] = i; // Store selected option
-        updateScores(); // Recalculate scores
+      let y = optionYStart + i * (buttonHeight + buttonSpacing);
+      let optionWidth = width * 0.8;
+      let optionX = (width - optionWidth) / 2;
+      if (mouseX > optionX && mouseX < optionX + optionWidth && mouseY > y - buttonHeight / 2 && mouseY < y + buttonHeight / 2) {
+        answers[currentQuestion] = i;
+        updateScores();
         console.log(`Answer selected for Q${currentQuestion + 1}: ${q.options[i].text}`);
         optionSelected = true;
-        break; // Exit loop after selecting an option
+        break;
       }
     }
-    
-    // Handle navigation only if no option was selected in this click
+
+    // Handle navigation
+    let navButtonY = height * 0.85;
     if (!optionSelected) {
-      // Previous button
-      if (currentQuestion > 0 && mouseX > 50 && mouseX < 130 && mouseY > 340 && mouseY < 380) {
+      if (currentQuestion > 0 && mouseX > 20 && mouseX < 20 + buttonWidth && mouseY > navButtonY && mouseY < navButtonY + buttonHeight) {
+        buttonPressed.prev = true;
         currentQuestion--;
         console.log(`Moved to previous question: ${currentQuestion + 1}`);
-      }
-      // Next/Finish button
-      else if (mouseX > 470 && mouseX < 550 && mouseY > 340 && mouseY < 380) {
+      } else if (mouseX > width - buttonWidth - 20 && mouseX < width - 20 && mouseY > navButtonY && mouseY < navButtonY + buttonHeight) {
+        buttonPressed.next = true;
         if (currentQuestion < 9) {
           currentQuestion++;
           console.log(`Moved to next question: ${currentQuestion + 1}`);
-        } else if (answers.every(a => a !== -1)) { // All questions answered
+        } else if (answers.every(a => a !== -1)) {
           state = 'progress';
           console.log("All questions answered, moving to progress");
         } else {
@@ -284,16 +415,29 @@ function mousePressed() {
       }
     }
   } else if (state === 'results') {
-    if (mouseX > 250 && mouseX < 350 && mouseY > 340 && mouseY < 380) {
+    let shareButtonY = height * 0.75;
+    if (mouseX > width / 2 - buttonWidth - buttonSpacing / 2 && mouseX < width / 2 - buttonSpacing / 2 && mouseY > shareButtonY && mouseY < shareButtonY + buttonHeight) {
+      buttonPressed.fb = true;
       shareOnFacebook();
+    } else if (mouseX > width / 2 + buttonSpacing / 2 && mouseX < width / 2 + buttonWidth + buttonSpacing / 2 && mouseY > shareButtonY && mouseY < shareButtonY + buttonHeight) {
+      buttonPressed.twitter = true;
+      shareOnTwitter();
     }
   }
 }
 
+function mouseReleased() {
+  buttonPressed.start = false;
+  buttonPressed.prev = false;
+  buttonPressed.next = false;
+  buttonPressed.fb = false;
+  buttonPressed.twitter = false;
+}
+
 function updateScores() {
-  scores = { empathy: 0, skills: 0, independence: 0, wisdom: 0, creativity: 0 }; // Reset scores
+  scores = { empathy: 0, skills: 0, independence: 0, wisdom: 0, creativity: 0 };
   for (let i = 0; i < answers.length; i++) {
-    if (answers[i] !== -1) { // If question is answered
+    if (answers[i] !== -1) {
       let q = randomizedQuestions[i];
       let traits = q.options[answers[i]].traits;
       for (let trait in traits) {
@@ -307,7 +451,7 @@ function updateScores() {
 function calculateArchetypePercentages() {
   let totalScore = scores.empathy + scores.skills + scores.independence + scores.wisdom + scores.creativity;
   if (totalScore === 0) totalScore = 1;
-  
+
   let normalized = {
     empathy: scores.empathy / totalScore,
     skills: scores.skills / totalScore,
@@ -315,7 +459,7 @@ function calculateArchetypePercentages() {
     wisdom: scores.wisdom / totalScore,
     creativity: scores.creativity / totalScore
   };
-  
+
   let results = archetypes.map(archetype => {
     let similarity = 0;
     for (let trait in archetype.traits) {
@@ -324,7 +468,7 @@ function calculateArchetypePercentages() {
     let percentage = (1 - similarity / 2) * 100;
     return { name: archetype.name, percentage: Math.max(0, percentage.toFixed(1)) };
   });
-  
+
   console.log("Calculated archetypes:", results);
   return results.sort((a, b) => b.percentage - a.percentage);
 }
@@ -342,11 +486,11 @@ function shareOnFacebook() {
     console.error("Archetype results not calculated yet");
     return;
   }
-  
+
   let topArchetype = archetypeResults[0].name;
   let shareUrl = `https://archtype-grok.vercel.app/api/og?archetype=${encodeURIComponent(topArchetype)}&t=${Date.now()}`;
   let facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-  
+
   try {
     window.open(facebookUrl, '_blank');
     console.log("Sharing to Facebook:", facebookUrl);
@@ -356,3 +500,17 @@ function shareOnFacebook() {
   }
 }
 
+function shareOnTwitter() {
+  if (!archetypeResults) {
+    console.error("Archetype results not calculated yet");
+    return;
+  }
+
+  let topArchetype = archetypeResults[0].name;
+  let shareText = `I discovered I'm a ${topArchetype} in the Archetype Quiz! Find out your archetype here: `;
+  let shareUrl = `https://archtype-grok.vercel.app/?archetype=${encodeURIComponent(topArchetype)}&t=${Date.now()}`;
+  let twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText + shareUrl)}`;
+
+  window.open(twitterUrl, '_blank');
+  console.log("Sharing to Twitter:", twitterUrl);
+}
