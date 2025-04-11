@@ -191,43 +191,30 @@ function drawBackground() {
 
 function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
   let startColor = c1;
-  let endColor = c2;
   let scaleFactor = 1.0;
   if (isPressed && mouseIsPressed) {
     startColor = color(red(c1) * 0.9, green(c1) * 0.9, blue(c1) * 0.9);
-    endColor = color(red(c2) * 0.9, green(c2) * 0.9, blue(c2) * 0.9);
     scaleFactor = 0.98;
   } else if (isHovered) {
     startColor = color(red(c1) * 1.1, green(c1) * 1.1, blue(c1) * 1.1);
-    endColor = color(red(c2) * 1.1, green(c2) * 1.1, blue(c2) * 1.1);
     scaleFactor = 1.02;
   }
 
-  // Draw the button background with scaling
   push();
   translate(x + w / 2, y + h / 2);
   scale(scaleFactor);
   translate(-(x + w / 2), -(y + h / 2));
 
-  // Add shadow
   drawingContext.shadowBlur = 4;
   drawingContext.shadowColor = 'rgba(0, 0, 0, 0.1)';
-
-  // Draw gradient
-  for (let i = 0; i < h; i++) {
-    let inter = map(i, 0, h, 0, 1);
-    let c = lerpColor(startColor, endColor, inter);
-    stroke(c);
-    line(x, y + i, x + w, y + i);
-  }
-
-  // Reset shadow
+  fill(startColor);
+  noStroke();
+  rect(x, y, w, h, 4);
   drawingContext.shadowBlur = 0;
   pop();
 
-  // Draw the text separately, ensuring no transformations affect it
   push();
-  fill(255); // White text
+  fill(255);
   textSize(fontSizeMedium * 1.2);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
@@ -235,7 +222,6 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
   text(text, x + w / 2, y + h / 2);
   pop();
 }
-
 function drawLandingPage() {
   drawBackground();
 
