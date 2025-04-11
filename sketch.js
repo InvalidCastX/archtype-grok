@@ -113,7 +113,9 @@ function drawQuestion() {
   
   for (let i = 0; i < q.options.length; i++) {
     let y = 100 + i * 60;
-    fill(answers[currentQuestion] === i ? 255, 215, 0 : 255, 245, 238); // Highlight selected option
+    // Determine the color based on whether the option is selected
+    let fillColor = answers[currentQuestion] === i ? [255, 215, 0] : [255, 245, 238];
+    fill(fillColor[0], fillColor[1], fillColor[2]); // Set the fill color
     rect(150, y - 20, 300, 40, 5);
     fill(50);
     textSize(16);
