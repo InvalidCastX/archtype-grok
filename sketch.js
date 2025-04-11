@@ -105,28 +105,28 @@ function updateCanvasSize() {
     // Mobile
     canvasWidth = windowWidth - 20;
     canvasHeight = windowHeight * 0.85;
-    fontSizeLarge = canvasWidth * 0.07; // Slightly smaller for better fit
-    fontSizeMedium = canvasWidth * 0.045;
-    fontSizeSmall = canvasWidth * 0.03;
-    buttonWidth = canvasWidth * 0.25;
-    buttonHeight = canvasHeight * 0.08;
+    fontSizeLarge = canvasWidth * 0.08; // Increased for better readability
+    fontSizeMedium = canvasWidth * 0.05;
+    fontSizeSmall = canvasWidth * 0.035;
+    buttonWidth = canvasWidth * 0.5; // Wider button for better CTA
+    buttonHeight = canvasHeight * 0.1;
     buttonSpacing = canvasWidth * 0.06;
   } else {
     // Desktop
     canvasWidth = 600;
     canvasHeight = 400;
-    fontSizeLarge = 28; // Slightly smaller for better balance
-    fontSizeMedium = 16;
-    fontSizeSmall = 12;
-    buttonWidth = 100;
-    buttonHeight = 40;
+    fontSizeLarge = 36; // Increased for better readability
+    fontSizeMedium = 20;
+    fontSizeSmall = 14;
+    buttonWidth = 200; // Wider button for better CTA
+    buttonHeight = 50;
     buttonSpacing = 25;
   }
 }
 
 function draw() {
   if (!questionsLoaded && questions.length === 0) {
-    background(255, 255, 255, 50);
+    drawGradientBackground();
     fill(255);
     textSize(fontSizeMedium);
     text("Loading questions...", width / 2, height / 2);
@@ -144,12 +144,12 @@ function draw() {
   // Check for hover states
   if (state === 'landing') {
     let buttonX = width / 2 - buttonWidth / 2;
-    let buttonY = height * 0.65; // Moved up from 0.75
+    let buttonY = height * 0.75; // Adjusted position
     if (mouseX > buttonX && mouseX < buttonX + buttonWidth && mouseY > buttonY && mouseY < buttonY + buttonHeight) {
       buttonHovered.start = true;
     }
   } else if (state === 'quiz') {
-    let navButtonY = height * 0.8; // Moved up from 0.85
+    let navButtonY = height * 0.8;
     if (currentQuestion > 0 && mouseX > 30 && mouseX < 30 + buttonWidth && mouseY > navButtonY && mouseY < navButtonY + buttonHeight) {
       buttonHovered.prev = true;
     }
@@ -157,7 +157,7 @@ function draw() {
       buttonHovered.next = true;
     }
   } else if (state === 'results') {
-    let shareButtonY = height * 0.65; // Moved up from 0.75
+    let shareButtonY = height * 0.65;
     if (mouseX > width / 2 - buttonWidth - buttonSpacing / 2 && mouseX < width / 2 - buttonSpacing / 2 && mouseY > shareButtonY && mouseY < shareButtonY + buttonHeight) {
       buttonHovered.fb = true;
     }
@@ -177,21 +177,39 @@ function draw() {
   }
 }
 
+function drawGradientBackground() {
+  for (let i = 0; i < height; i++) {
+    let inter = map(i, 0, height, 0, 1);
+    let c = lerpColor(color(110, 72, 170), color(157, 80, 187), inter);
+    stroke(c);
+    line(0, i, width, i);
+  }
+}
+
 function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
   // Adjust colors based on hover and press states
   let startColor = c1;
   let endColor = c2;
+  let scaleFactor = 1.0;
   if (isPressed && mouseIsPressed) {
     startColor = color(red(c1) * 0.8, green(c1) * 0.8, blue(c1) * 0.8);
     endColor = color(red(c2) * 0.8, green(c2) * 0.8, blue(c2) * 0.8);
+    scaleFactor = 0.95;
   } else if (isHovered) {
     startColor = color(red(c1) * 1.1, green(c1) * 1.1, blue(c1) * 1.1);
     endColor = color(red(c2) * 1.1, green(c2) * 1.1, blue(c2) * 1.1);
+    scaleFactor = 1.05;
   }
 
+  // Apply scaling for hover/pressed effect
+  push();
+  translate(x + w / 2, y + h / 2);
+  scale(scaleFactor);
+  translate(-(x + w / 2), -(y + h / 2));
+
   // Add shadow
-  drawingContext.shadowBlur = 10;
-  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
+  drawingContext.shadowBlur = 15;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.5)';
 
   // Draw gradient
   for (let i = 0; i < h; i++) {
@@ -203,9 +221,9 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
 
   // Draw border
   noFill();
-  stroke(255, 255, 255, 150);
+  stroke(255, 255, 255, 200);
   strokeWeight(2);
-  rect(x, y, w, h, 10);
+  rect(x, y, w, h, 15);
 
   // Reset stroke and shadow
   noStroke();
@@ -213,49 +231,68 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
 
   // Draw text
   fill(255);
-  textSize(fontSizeMedium);
-  textStyle(NORMAL);
+  textSize(fontSizeMedium * 1.2); // Increased text size for better readability
+  textStyle(BOLD);
   text(text, x + w / 2, y + h / 2);
+
+  pop();
 }
 
 function drawLandingPage() {
-  background(255, 255, 255, 50);
+  drawGradientBackground();
 
   drawingContext.shadowBlur = 5;
   drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
 
-  // Title (moved up slightly)
-  fill(255, 245, 255); // Slightly pinkish white for warmth
+  // Title
+  fill(255, 245, 255);
   textSize(fontSizeLarge);
   textStyle(BOLD);
-  text("Discover Your Male Archetype", width / 2, height * 0.12); // Moved up from 0.15
+  text("Discover Your Male Archetype", width / 2, height * 0.2);
 
-  // Subtitle (moved up slightly)
+  // Gradient underline for title
+  for (let i = 0; i < 5; i++) {
+    let inter = map(i, 0, 5, 0, 1);
+    let c = lerpColor(color(255, 105, 180), color(255, 150, 200), inter);
+    stroke(c);
+    strokeWeight(2);
+    line(width * 0.3, height * 0.25 + i, width * 0.7, height * 0.25 + i);
+  }
+  noStroke();
+
+  // Subtitle
+  fill(220, 200, 255);
   textSize(fontSizeMedium);
   textStyle(NORMAL);
-  text("Explore 12 universal patterns", width / 2, height * 0.22); // Moved up from 0.25
+  text("Explore 12 universal patterns of masculinity", width / 2, height * 0.32);
 
-  // Archetype list (spread out more)
+  // Show only a few archetypes as a teaser
   textSize(fontSizeSmall);
-  let y = height * 0.28; // Moved up from 0.35
-  for (let archetype of archetypes) {
-    fill(200, 180, 255); // Soft lavender for secondary text
+  let y = height * 0.4;
+  const teaserArchetypes = archetypes.slice(0, 3); // Show only first 3
+  for (let archetype of teaserArchetypes) {
+    fill(200, 180, 255);
     text(`${archetype.name}: ${archetype.desc}`, width / 2, y);
-    y += fontSizeSmall * 1.8; // Increased spacing
+    y += fontSizeSmall * 2.5; // Increased spacing
   }
 
-  // Start Quiz button (moved up)
+  // Add a "See all archetypes" hint
+  fill(180, 160, 240);
+  textSize(fontSizeSmall * 0.9);
+  text("...and 9 more archetypes to discover!", width / 2, y);
+
+  // Start Quiz button
   let buttonX = width / 2 - buttonWidth / 2;
-  let buttonY = height * 0.65; // Moved up from 0.75
-  let c1 = color(110, 72, 170); // Darker purple (matches background start: #6e48aa)
-  let c2 = color(157, 80, 187); // Lighter purple (matches background end: #9d50bb)
+  let buttonY = height * 0.75;
+  let c1 = color(255, 105, 180); // Hot pink
+  let c2 = color(255, 150, 200); // Lighter pink
   drawButton(buttonX, buttonY, buttonWidth, buttonHeight, "Start Quiz", c1, c2, buttonPressed.start, buttonHovered.start);
 
   drawingContext.shadowBlur = 0;
 }
 
 function drawQuestion() {
-  background(255, 255, 255, 50);
+  drawGradientBackground();
 
   let q = randomizedQuestions[currentQuestion];
   if (!q) {
@@ -267,20 +304,17 @@ function drawQuestion() {
   drawingContext.shadowBlur = 5;
   drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
 
-  // Question text (moved up slightly)
   fill(255, 245, 255);
   textSize(fontSizeLarge);
-  text(q.text, width / 2, height * 0.12); // Moved up from 0.15
+  text(q.text, width / 2, height * 0.12);
 
-  // Question number (moved up slightly)
   textSize(fontSizeSmall);
   fill(200, 180, 255);
-  text(`Question ${currentQuestion + 1} of 10`, width / 2, height * 0.20); // Moved up from 0.25
+  text(`Question ${currentQuestion + 1} of 10`, width / 2, height * 0.20);
 
-  // Options (spread out more)
-  let optionYStart = height * 0.28; // Moved up from 0.35
+  let optionYStart = height * 0.28;
   for (let i = 0; i < q.options.length; i++) {
-    let y = optionYStart + i * (buttonHeight + buttonSpacing * 1.5); // Increased spacing
+    let y = optionYStart + i * (buttonHeight + buttonSpacing * 1.5);
     let optionWidth = width * 0.8;
     let optionX = (width - optionWidth) / 2;
 
@@ -289,21 +323,20 @@ function drawQuestion() {
     noStroke();
     rect(optionX, y - buttonHeight / 2, optionWidth, buttonHeight, 10);
 
-    fill(60, 40, 80); // Dark purple for option text
+    fill(60, 40, 80);
     textSize(fontSizeMedium);
     text(q.options[i].text, width / 2, y);
   }
 
-  // Navigation buttons (moved up and adjusted horizontal spacing)
-  let navButtonY = height * 0.80; // Moved up from 0.85
+  let navButtonY = height * 0.80;
 
   if (currentQuestion > 0) {
-    let c1 = color(130, 90, 190); // Softer purple
+    let c1 = color(130, 90, 190);
     let c2 = color(170, 130, 230);
     drawButton(30, navButtonY, buttonWidth, buttonHeight, "Previous", c1, c2, buttonPressed.prev, buttonHovered.prev);
   }
 
-  let c1 = color(190, 120, 220); // Lighter purple
+  let c1 = color(190, 120, 220);
   let c2 = color(230, 160, 255);
   drawButton(width - buttonWidth - 30, navButtonY, buttonWidth, buttonHeight, currentQuestion === 9 ? "Finish" : "Next", c1, c2, buttonPressed.next, buttonHovered.next);
 
@@ -311,20 +344,18 @@ function drawQuestion() {
 }
 
 function drawProgress() {
-  background(255, 255, 255, 50);
+  drawGradientBackground();
 
   drawingContext.shadowBlur = 5;
   drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
 
-  // Text (moved up)
   fill(255, 245, 255);
   textSize(fontSizeLarge);
-  text("Calculating Your Archetype...", width / 2, height * 0.35); // Moved up from 0.4
+  text("Calculating Your Archetype...", width / 2, height * 0.35);
 
-  // Progress bar (centered better)
   let barWidth = map(progress, 0, 100, 0, width * 0.8);
   let barX = (width - barWidth) / 2;
-  fill(170, 130, 230); // Softer purple for progress bar
+  fill(170, 130, 230);
   noStroke();
   rect(barX, height * 0.45, barWidth, 20, 10);
 
@@ -343,7 +374,7 @@ function drawProgress() {
 }
 
 function drawResults() {
-  background(255, 255, 255, 50);
+  drawGradientBackground();
 
   if (!archetypeResults) {
     console.error("Archetype results not calculated yet");
@@ -355,33 +386,29 @@ function drawResults() {
 
   let topArchetype = archetypeResults[0];
 
-  // Main result (moved up)
   fill(255, 245, 255);
   textSize(fontSizeLarge);
   textStyle(BOLD);
-  text(`You are a ${topArchetype.name}!`, width / 2, height * 0.15); // Moved up from 0.2
+  text(`You are a ${topArchetype.name}!`, width / 2, height * 0.15);
 
-  // Percentage (moved up)
   textSize(fontSizeMedium);
   textStyle(NORMAL);
-  text(`${topArchetype.percentage}% match`, width / 2, height * 0.25); // Moved up from 0.3
+  text(`${topArchetype.percentage}% match`, width / 2, height * 0.25);
 
-  // Archetype list (spread out more)
   textSize(fontSizeSmall);
-  let y = height * 0.32; // Moved up from 0.4
+  let y = height * 0.32;
   for (let i = 1; i < archetypeResults.length; i++) {
     fill(200, 180, 255);
     text(`${archetypeResults[i].name}: ${archetypeResults[i].percentage}%`, width / 2, y);
-    y += fontSizeSmall * 1.8; // Increased spacing
+    y += fontSizeSmall * 1.8;
   }
 
-  // Share buttons (moved up)
-  let shareButtonY = height * 0.65; // Moved up from 0.75
-  let c1 = color(130, 90, 190); // Softer purple
+  let shareButtonY = height * 0.65;
+  let c1 = color(130, 90, 190);
   let c2 = color(170, 130, 230);
   drawButton(width / 2 - buttonWidth - buttonSpacing / 2, shareButtonY, buttonWidth, buttonHeight, "Share on FB", c1, c2, buttonPressed.fb, buttonHovered.fb);
 
-  c1 = color(190, 120, 220); // Lighter purple
+  c1 = color(190, 120, 220);
   c2 = color(230, 160, 255);
   drawButton(width / 2 + buttonSpacing / 2, shareButtonY, buttonWidth, buttonHeight, "Share on X", c1, c2, buttonPressed.twitter, buttonHovered.twitter);
 
@@ -400,7 +427,7 @@ function mousePressed() {
 
   if (state === 'landing') {
     let buttonX = width / 2 - buttonWidth / 2;
-    let buttonY = height * 0.65;
+    let buttonY = height * 0.75;
     if (mouseX > buttonX && mouseX < buttonX + buttonWidth && mouseY > buttonY && mouseY < buttonY + buttonHeight) {
       buttonPressed.start = true;
       if (questions.length > 0) {
