@@ -15,6 +15,7 @@ let progress = 0; // For progress bar animation
 let lastClickTime = 0; // Debounce variable
 const CLICK_DEBOUNCE = 300; // Increased to 300ms for stricter debounce
 let questions = []; // Will be loaded from questions.json
+let questionsLoaded = false; // Flag to track if questions are loaded
 
 const archetypes = [
   { name: "King", desc: "Balanced leadership with wisdom and independence.", traits: { wisdom: 0.4, independence: 0.3, empathy: 0.1, skills: 0.1, creativity: 0.1 } },
@@ -36,8 +37,10 @@ function preload() {
   console.log("Preloading questions.json");
   questions = loadJSON("questions.json", () => {
     console.log("questions.json loaded successfully", questions);
+    questionsLoaded = true; // Set flag when questions are loaded
   }, (error) => {
     console.error("Failed to load questions.json", error);
+    questionsLoaded = false;
   });
 }
 
@@ -49,8 +52,8 @@ function setup() {
 }
 
 function draw() {
-  // Add a loading screen until questions are loaded
-  if (!questions || questions.length === 0) {
+  // Add a loading screen if questions are not loaded
+  if (!questionsLoaded || !questions || questions.length === 0) {
     background(220);
     fill(0);
     text("Loading questions...", width / 2, height / 2);
@@ -92,11 +95,20 @@ function drawLandingPage() {
     y += 20;
   }
   
-  fill(255, 165, 0);
-  rect(250, 340, 100, 40, 10);
-  fill(255);
-  textSize(18);
-  text("Start Quiz", 300, 360);
+  // Show "Start Quiz" button only if questions are loaded
+  if (questionsLoaded) {
+    fill(255, 165, 0);
+    rect(250, 340, 100, 40, 10);
+    fill(255);
+    textSize(18);
+    text("Start Quiz", 300, 360);
+  } else {
+    fill(150);
+    rect(250, 340, 100, 40, 10);
+    fill(255);
+    textSize(18);
+    text("Loading...", 300, 360);
+  }
 }
 
 function drawQuestion() {
@@ -205,12 +217,16 @@ function mousePressed() {
 
   if (state === 'landing') {
     if (mouseX > 250 && mouseX < 350 && mouseY > 340 && mouseY < 380) {
-      state = 'quiz';
-      randomizedQuestions = shuffleArray([...questions]).slice(0, 10);
-      currentQuestion = 0;
-      scores = { empathy: 0, skills: 0, independence: 0, wisdom: 0, creativity: 0 };
-      answers = Array(10).fill(-1); // Initialize answers array with -1 (unanswered)
-      console.log("Quiz started, questions randomized:", randomizedQuestions);
+      if (questionsLoaded) {
+        state = 'quiz';
+        randomizedQuestions = shuffleArray([...questions]).slice(0, 10);
+        currentQuestion = 0;
+        scores = { empathy: 0, skills: 0, independence: 0, wisdom: 0, creativity: 0 };
+        answers = Array(10).fill(-1); // Initialize answers array with -1 (unanswered)
+        console.log("Quiz started, questions randomized:", randomizedQuestions);
+      } else {
+        console.log("Cannot start quiz: questions not yet loaded");
+      }
     }
   } else if (state === 'quiz') {
     let q = randomizedQuestions[currentQuestion];
