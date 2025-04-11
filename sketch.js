@@ -35,9 +35,16 @@ const archetypes = [
 // Load the questions from questions.json before setup()
 function preload() {
   console.log("Preloading questions.json");
-  questions = loadJSON("questions.json", () => {
+  loadJSON("questions.json", (loadedQuestions) => {
+    questions = loadedQuestions; // Assign the loaded data to questions
     console.log("questions.json loaded successfully", questions);
-    questionsLoaded = true; // Set flag when questions are loaded
+    if (Array.isArray(questions) && questions.length > 0) {
+      questionsLoaded = true;
+      console.log("questionsLoaded set to true");
+    } else {
+      console.error("Loaded questions is not a valid array:", questions);
+      questionsLoaded = false;
+    }
   }, (error) => {
     console.error("Failed to load questions.json", error);
     questionsLoaded = false;
@@ -53,7 +60,7 @@ function setup() {
 
 function draw() {
   // Add a loading screen if questions are not loaded
-  if (!questionsLoaded || !questions || questions.length === 0) {
+  if (!questionsLoaded || !Array.isArray(questions) || questions.length === 0) {
     background(220);
     fill(0);
     text("Loading questions...", width / 2, height / 2);
@@ -115,6 +122,12 @@ function drawQuestion() {
   background(173, 216, 230);
   
   let q = randomizedQuestions[currentQuestion];
+  if (!q) {
+    console.error("Question is undefined at index", currentQuestion, "randomizedQuestions:", randomizedQuestions);
+    state = 'landing'; // Reset to landing page if there's an error
+    return;
+  }
+  
   fill(50);
   textSize(20);
   text(q.text, width / 2, 40);
@@ -217,7 +230,7 @@ function mousePressed() {
 
   if (state === 'landing') {
     if (mouseX > 250 && mouseX < 350 && mouseY > 340 && mouseY < 380) {
-      if (questionsLoaded) {
+      if (questionsLoaded && Array.isArray(questions) && questions.length > 0) {
         state = 'quiz';
         randomizedQuestions = shuffleArray([...questions]).slice(0, 10);
         currentQuestion = 0;
@@ -225,7 +238,7 @@ function mousePressed() {
         answers = Array(10).fill(-1); // Initialize answers array with -1 (unanswered)
         console.log("Quiz started, questions randomized:", randomizedQuestions);
       } else {
-        console.log("Cannot start quiz: questions not yet loaded");
+        console.log("Cannot start quiz: questions not yet loaded or invalid", questions);
       }
     }
   } else if (state === 'quiz') {
