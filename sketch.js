@@ -337,7 +337,6 @@ function shuffleArray(array) {
   return array;
 }
 
-
 function shareOnFacebook() {
   if (!archetypeResults) {
     console.error("Archetype results not calculated yet");
@@ -345,9 +344,15 @@ function shareOnFacebook() {
   }
   
   let topArchetype = archetypeResults[0].name;
-  let shareUrl = `https://archtype-grok.vercel.app/api/og?archetype=${encodeURIComponent(topArchetype)}`;
+  let shareUrl = `https://archtype-grok.vercel.app/api/og?archetype=${encodeURIComponent(topArchetype)}&t=${Date.now()}`;
   let facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
   
-  window.open(facebookUrl, '_blank');
-  console.log("Sharing to Facebook:", facebookUrl);
+  try {
+    window.open(facebookUrl, '_blank');
+    console.log("Sharing to Facebook:", facebookUrl);
+  } catch (error) {
+    console.error("Failed to open Facebook share dialog:", error);
+    alert(`Facebook sharing is currently unavailable. Please copy this URL and share it manually on Facebook:\n\n${shareUrl}`);
+  }
 }
+
