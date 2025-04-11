@@ -106,9 +106,9 @@ function updateCanvasSize() {
     // Mobile
     canvasWidth = windowWidth - 20;
     canvasHeight = windowHeight * 0.85;
-    fontSizeLarge = 20; // Scaled down from 24px for mobile
-    fontSizeMedium = 14; // Scaled down from 16px
-    fontSizeSmall = 12; // Scaled down from 14px
+    fontSizeLarge = 20;
+    fontSizeMedium = 14;
+    fontSizeSmall = 12;
     buttonWidth = canvasWidth * 0.5;
     buttonHeight = canvasHeight * 0.08;
     buttonSpacing = canvasWidth * 0.04;
@@ -116,9 +116,9 @@ function updateCanvasSize() {
     // Desktop
     canvasWidth = 600;
     canvasHeight = 400;
-    fontSizeLarge = 24; // Facebook title size
-    fontSizeMedium = 16; // Facebook subtitle/button size
-    fontSizeSmall = 14; // Facebook body text size
+    fontSizeLarge = 24;
+    fontSizeMedium = 16;
+    fontSizeSmall = 14;
     buttonWidth = 180;
     buttonHeight = 40;
     buttonSpacing = 20;
@@ -204,6 +204,7 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
   }
 
   push();
+  // Apply scaling for the button background
   translate(x + w / 2, y + h / 2);
   scale(scaleFactor);
   translate(-(x + w / 2), -(y + h / 2));
@@ -224,18 +225,20 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
   noFill();
   stroke(0, 0, 0, 0);
   strokeWeight(0);
-  rect(x, y, w, h, 4); // Facebook button border radius
+  rect(x, y, w, h, 4);
 
-  // Reset stroke and shadow
-  noStroke();
+  // Reset shadow for text
   drawingContext.shadowBlur = 0;
+  pop();
 
-  // Draw text
-  fill(255);
-  textSize(fontSizeMedium);
+  // Draw text in a separate push/pop to avoid scaling issues
+  push();
+  fill(255); // White text
+  textSize(fontSizeMedium * 1.2); // Slightly larger text for buttons
   textStyle(BOLD);
+  textAlign(CENTER, CENTER);
+  console.log(`Drawing button text: "${text}" at (${x + w / 2}, ${y + h / 2}) with size ${fontSizeMedium * 1.2}`);
   text(text, x + w / 2, y + h / 2);
-
   pop();
 }
 
