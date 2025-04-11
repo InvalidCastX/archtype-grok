@@ -1,0 +1,227 @@
+[
+  {
+    "text": "How do you handle conflict?",
+    "options": [
+      { "text": "I mediate and seek understanding", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "I strategize and take decisive action", "traits": { "skills": 2, "independence": 1 } },
+      { "text": "I stand my ground and fight if needed", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "I use humor to diffuse tension", "traits": { "creativity": 2, "empathy": 1 } }
+    ]
+  },
+  {
+    "text": "What motivates you most?",
+    "options": [
+      { "text": "Helping others grow and succeed", "traits": { "empathy": 2, "skills": 1 } },
+      { "text": "Discovering new ideas or places", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "Mastering a craft or skill", "traits": { "skills": 2, "wisdom": 1 } },
+      { "text": "Creating something unique", "traits": { "creativity": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "How do you approach leadership?",
+    "options": [
+      { "text": "By inspiring and guiding others", "traits": { "wisdom": 2, "empathy": 1 } },
+      { "text": "By setting a clear vision and rules", "traits": { "independence": 2, "wisdom": 1 } },
+      { "text": "By adapting and innovating", "traits": { "creativity": 2, "skills": 1 } },
+      { "text": "By supporting and nurturing the team", "traits": { "empathy": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "What’s your approach to learning?",
+    "options": [
+      { "text": "I study deeply to understand", "traits": { "wisdom": 2, "skills": 1 } },
+      { "text": "I experiment and figure it out", "traits": { "creativity": 2, "independence": 1 } },
+      { "text": "I seek guidance from others", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "I dive in and learn by doing", "traits": { "independence": 2, "skills": 1 } }
+    ]
+  },
+  {
+    "text": "How do you spend your free time?",
+    "options": [
+      { "text": "Helping friends or family", "traits": { "empathy": 2, "independence": 1 } },
+      { "text": "Exploring new places or ideas", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "Working on a creative project", "traits": { "creativity": 2, "skills": 1 } },
+      { "text": "Reflecting or reading", "traits": { "wisdom": 2, "empathy": 1 } }
+    ]
+  },
+  {
+    "text": "How do you react to failure?",
+    "options": [
+      { "text": "I learn and move forward", "traits": { "wisdom": 2, "independence": 1 } },
+      { "text": "I try a new approach", "traits": { "creativity": 2, "skills": 1 } },
+      { "text": "I support others through it", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "I push harder next time", "traits": { "independence": 2, "skills": 1 } }
+    ]
+  },
+  {
+    "text": "What’s your ideal role in a group?",
+    "options": [
+      { "text": "The leader who sets the tone", "traits": { "independence": 2, "wisdom": 1 } },
+      { "text": "The supporter who helps", "traits": { "empathy": 2, "skills": 1 } },
+      { "text": "The idea generator", "traits": { "creativity": 2, "independence": 1 } },
+      { "text": "The planner who organizes", "traits": { "skills": 2, "wisdom": 1 } }
+    ]
+  },
+  {
+    "text": "How do you make decisions?",
+    "options": [
+      { "text": "Based on logic and experience", "traits": { "wisdom": 2, "skills": 1 } },
+      { "text": "By trusting my instincts", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "By considering others’ feelings", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "By weighing all possibilities", "traits": { "skills": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "What inspires you in others?",
+    "options": [
+      { "text": "Their kindness and care", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "Their boldness and freedom", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "Their skill and dedication", "traits": { "skills": 2, "wisdom": 1 } },
+      { "text": "Their imagination and vision", "traits": { "creativity": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "How do you handle stress?",
+    "options": [
+      { "text": "I reflect and find peace", "traits": { "wisdom": 2, "empathy": 1 } },
+      { "text": "I take action to fix it", "traits": { "independence": 2, "skills": 1 } },
+      { "text": "I channel it into something creative", "traits": { "creativity": 2, "independence": 1 } },
+      { "text": "I talk it out with someone", "traits": { "empathy": 2, "wisdom": 1 } }
+    ]
+  },
+  {
+    "text": "What’s your biggest strength?",
+    "options": [
+      { "text": "My ability to connect with people", "traits": { "empathy": 2, "independence": 1 } },
+      { "text": "My innovative thinking", "traits": { "creativity": 2, "skills": 1 } },
+      { "text": "My determination and focus", "traits": { "independence": 2, "wisdom": 1 } },
+      { "text": "My knowledge and insight", "traits": { "wisdom": 2, "skills": 1 } }
+    ]
+  },
+  {
+    "text": "How do you view rules?",
+    "options": [
+      { "text": "They’re guides to improve", "traits": { "wisdom": 2, "skills": 1 } },
+      { "text": "I bend them if needed", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "I respect them for harmony", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "I challenge them for progress", "traits": { "creativity": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "What’s your approach to helping others?",
+    "options": [
+      { "text": "I teach them what I know", "traits": { "wisdom": 2, "skills": 1 } },
+      { "text": "I encourage their independence", "traits": { "independence": 2, "empathy": 1 } },
+      { "text": "I listen and support them", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "I inspire them with ideas", "traits": { "creativity": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "How do you approach risk?",
+    "options": [
+      { "text": "I weigh it carefully", "traits": { "wisdom": 2, "skills": 1 } },
+      { "text": "I embrace it for growth", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "I take it to help others", "traits": { "empathy": 2, "independence": 1 } },
+      { "text": "I turn it into opportunity", "traits": { "creativity": 2, "skills": 1 } }
+    ]
+  },
+  {
+    "text": "What’s your favorite type of challenge?",
+    "options": [
+      { "text": "Solving complex problems", "traits": { "wisdom": 2, "skills": 1 } },
+      { "text": "Exploring the unknown", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "Helping someone in need", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "Creating something new", "traits": { "creativity": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "How do you express yourself?",
+    "options": [
+      { "text": "Through thoughtful words", "traits": { "wisdom": 2, "empathy": 1 } },
+      { "text": "Through bold actions", "traits": { "independence": 2, "skills": 1 } },
+      { "text": "Through art or innovation", "traits": { "creativity": 2, "independence": 1 } },
+      { "text": "Through care for others", "traits": { "empathy": 2, "wisdom": 1 } }
+    ]
+  },
+  {
+    "text": "What’s your ideal legacy?",
+    "options": [
+      { "text": "A wiser, better world", "traits": { "wisdom": 2, "empathy": 1 } },
+      { "text": "A life of freedom and adventure", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "A masterpiece I created", "traits": { "creativity": 2, "skills": 1 } },
+      { "text": "A community I supported", "traits": { "empathy": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "How do you view authority?",
+    "options": [
+      { "text": "It’s earned through wisdom", "traits": { "wisdom": 2, "skills": 1 } },
+      { "text": "I question it often", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "It’s a tool for good", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "I’d rather lead than follow", "traits": { "independence": 2, "skills": 1 } }
+    ]
+  },
+  {
+    "text": "What drives your ambition?",
+    "options": [
+      { "text": "Making a difference", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "Achieving personal freedom", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "Perfecting my abilities", "traits": { "skills": 2, "wisdom": 1 } },
+      { "text": "Building something lasting", "traits": { "creativity": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "How do you recharge?",
+    "options": [
+      { "text": "Spending time alone thinking", "traits": { "wisdom": 2, "independence": 1 } },
+      { "text": "Being with loved ones", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "Working on a passion project", "traits": { "creativity": 2, "skills": 1 } },
+      { "text": "Exploring new experiences", "traits": { "independence": 2, "creativity": 1 } }
+    ]
+  },
+  {
+    "text": "What’s your approach to tradition?",
+    "options": [
+      { "text": "I honor what works", "traits": { "wisdom": 2, "skills": 1 } },
+      { "text": "I break it for progress", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "I adapt it for others", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "I reinvent it creatively", "traits": { "creativity": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "How do you define success?",
+    "options": [
+      { "text": "Inner peace and understanding", "traits": { "wisdom": 2, "empathy": 1 } },
+      { "text": "Freedom and autonomy", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "Mastery of my craft", "traits": { "skills": 2, "wisdom": 1 } },
+      { "text": "A legacy of innovation", "traits": { "creativity": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "What’s your role in a crisis?",
+    "options": [
+      { "text": "The calm voice of reason", "traits": { "wisdom": 2, "empathy": 1 } },
+      { "text": "The one taking charge", "traits": { "independence": 2, "skills": 1 } },
+      { "text": "The creative problem-solver", "traits": { "creativity": 2, "independence": 1 } },
+      { "text": "The helper who comforts", "traits": { "empathy": 2, "wisdom": 1 } }
+    ]
+  },
+  {
+    "text": "How do you view competition?",
+    "options": [
+      { "text": "A chance to improve", "traits": { "skills": 2, "wisdom": 1 } },
+      { "text": "A test of my will", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "A way to unite people", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "A spark for new ideas", "traits": { "creativity": 2, "independence": 1 } }
+    ]
+  },
+  {
+    "text": "What’s your ultimate goal?",
+    "options": [
+      { "text": "To guide and uplift others", "traits": { "empathy": 2, "wisdom": 1 } },
+      { "text": "To live life on my terms", "traits": { "independence": 2, "creativity": 1 } },
+      { "text": "To achieve excellence", "traits": { "skills": 2, "wisdom": 1 } },
+      { "text": "To create something timeless", "traits": { "creativity": 2, "independence": 1 } }
+    ]
+  }
+]
