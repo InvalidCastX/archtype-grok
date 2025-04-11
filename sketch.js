@@ -16,6 +16,7 @@ let lastClickTime = 0; // Debounce variable
 const CLICK_DEBOUNCE = 300; // Increased to 300ms for stricter debounce
 let questions = []; // Will be loaded from questions.json
 let questionsLoaded = false; // Flag to track if questions are loaded
+let archetypeResults = null; // Store the calculated archetype results
 
 const archetypes = [
   { name: "King", desc: "Balanced leadership with wisdom and independence.", traits: { wisdom: 0.4, independence: 0.3, empathy: 0.1, skills: 0.1, creativity: 0.1 } },
@@ -184,6 +185,7 @@ function drawProgress() {
   
   progress += 2;
   if (progress >= 100) {
+    archetypeResults = calculateArchetypePercentages(); // Calculate results once
     state = 'results';
     progress = 0;
   }
@@ -192,8 +194,12 @@ function drawProgress() {
 function drawResults() {
   background(221, 160, 221);
   
-  let results = calculateArchetypePercentages();
-  let topArchetype = results[0];
+  if (!archetypeResults) {
+    console.error("Archetype results not calculated yet");
+    return;
+  }
+  
+  let topArchetype = archetypeResults[0];
   
   fill(255);
   textSize(36);
@@ -205,9 +211,9 @@ function drawResults() {
   
   textSize(12);
   let y = 180;
-  for (let i = 1; i < results.length; i++) {
+  for (let i = 1; i < archetypeResults.length; i++) {
     fill(100);
-    text(`${results[i].name}: ${results[i].percentage}%`, width / 2, y);
+    text(`${archetypeResults[i].name}: ${archetypeResults[i].percentage}%`, width / 2, y);
     y += 20;
   }
   
@@ -332,8 +338,12 @@ function shuffleArray(array) {
 }
 
 function shareOnFacebook() {
-  let results = calculateArchetypePercentages();
-  let topArchetype = results[0].name;
+  if (!archetypeResults) {
+    console.error("Archetype results not calculated yet");
+    return;
+  }
+  
+  let topArchetype = archetypeResults[0].name;
   let shareText = `I discovered I'm a ${topArchetype} in the Archetype Quiz! Find out your archetype here:`;
   let quizUrl = `https://archtype-grok.vercel.app/?archetype=${encodeURIComponent(topArchetype)}&t=${Date.now()}`;
   let facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(quizUrl)}&quote=${encodeURIComponent(shareText)}`;
