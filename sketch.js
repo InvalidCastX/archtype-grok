@@ -1,3 +1,5 @@
+console.log("sketch.js loaded");
+
 let state = 'landing'; // 'landing', 'quiz', 'results', 'progress'
 let currentQuestion = 0;
 let scores = {
@@ -10,6 +12,8 @@ let scores = {
 let randomizedQuestions = [];
 let answers = []; // Array to store user answers (index of selected option per question)
 let progress = 0; // For progress bar animation
+let lastClickTime = 0; // Debounce variable
+const CLICK_DEBOUNCE = 300; // Increased to 300ms for stricter debounce
 
 const questions = [
   { text: "How do you handle conflict?", options: [
@@ -183,7 +187,7 @@ function setup() {
   createCanvas(600, 400);
   textAlign(CENTER, CENTER);
   textSize(16);
-  console.log("Setup complete"); // Debug log
+  console.log("Setup complete");
 }
 
 function draw() {
@@ -243,7 +247,7 @@ function drawQuestion() {
   
   for (let i = 0; i < q.options.length; i++) {
     let y = 100 + i * 60;
-    fill(answers[currentQuestion] === i ? [255, 215, 0] : [255, 245, 238]); // Highlight selected option
+    fill(answers[currentQuestion] === i ? 255, 215, 0 : 255, 245, 238); // Highlight selected option
     rect(150, y - 20, 300, 40, 5);
     fill(50);
     textSize(16);
@@ -322,7 +326,15 @@ function drawResults() {
 }
 
 function mousePressed() {
-  console.log(`Mouse pressed at (${mouseX}, ${mouseY}), state: ${state}`); // Debug log
+  let currentTime = millis();
+  if (currentTime - lastClickTime < CLICK_DEBOUNCE) {
+    console.log("Click debounced");
+    return; // Debounce clicks
+  }
+  lastClickTime = currentTime;
+  
+  console.log(`Mouse pressed at (${mouseX}, ${mouseY}), state: ${state}, currentQuestion: ${currentQuestion}`);
+
   if (state === 'landing') {
     if (mouseX > 250 && mouseX < 350 && mouseY > 340 && mouseY < 380) {
       state = 'quiz';
@@ -335,32 +347,37 @@ function mousePressed() {
   } else if (state === 'quiz') {
     let q = randomizedQuestions[currentQuestion];
     
-    // Check for option selection
+    // Handle option selection
+    let optionSelected = false;
     for (let i = 0; i < q.options.length; i++) {
       let y = 100 + i * 60;
       if (mouseX > 150 && mouseX < 450 && mouseY > y - 20 && mouseY < y + 20) {
         answers[currentQuestion] = i; // Store selected option
         updateScores(); // Recalculate scores
         console.log(`Answer selected for Q${currentQuestion + 1}: ${q.options[i].text}`);
+        optionSelected = true;
+        break; // Exit loop after selecting an option
       }
     }
     
-    // Previous button
-    if (currentQuestion > 0 && mouseX > 50 && mouseX < 130 && mouseY > 340 && mouseY < 380) {
-      currentQuestion--;
-      console.log(`Moved to previous question: ${currentQuestion + 1}`);
-    }
-    
-    // Next/Finish button
-    if (mouseX > 470 && mouseX < 550 && mouseY > 340 && mouseY < 380) {
-      if (currentQuestion < 9) {
-        currentQuestion++;
-        console.log(`Moved to next question: ${currentQuestion + 1}`);
-      } else if (answers.every(a => a !== -1)) { // All questions answered
-        state = 'progress';
-        console.log("All questions answered, moving to progress");
-      } else {
-        console.log("Cannot finish: some questions unanswered", answers);
+    // Handle navigation only if no option was selected in this click
+    if (!optionSelected) {
+      // Previous button
+      if (currentQuestion > 0 && mouseX > 50 && mouseX < 130 && mouseY > 340 && mouseY < 380) {
+        currentQuestion--;
+        console.log(`Moved to previous question: ${currentQuestion + 1}`);
+      }
+      // Next/Finish button
+      else if (mouseX > 470 && mouseX < 550 && mouseY > 340 && mouseY < 380) {
+        if (currentQuestion < 9) {
+          currentQuestion++;
+          console.log(`Moved to next question: ${currentQuestion + 1}`);
+        } else if (answers.every(a => a !== -1)) { // All questions answered
+          state = 'progress';
+          console.log("All questions answered, moving to progress");
+        } else {
+          console.log("Cannot finish: some questions unanswered", answers);
+        }
       }
     }
   } else if (state === 'results') {
@@ -381,7 +398,7 @@ function updateScores() {
       }
     }
   }
-  console.log("Updated scores:", scores); // Debug log
+  console.log("Updated scores:", scores);
 }
 
 function calculateArchetypePercentages() {
@@ -405,7 +422,7 @@ function calculateArchetypePercentages() {
     return { name: archetype.name, percentage: Math.max(0, percentage.toFixed(1)) };
   });
   
-  console.log("Calculated archetypes:", results); // Debug log
+  console.log("Calculated archetypes:", results);
   return results.sort((a, b) => b.percentage - a.percentage);
 }
 
@@ -421,7 +438,7 @@ function shareOnFacebook() {
   let results = calculateArchetypePercentages();
   let topArchetype = results[0].name;
   let shareText = `I discovered I'm a ${topArchetype} in the Archetype Quiz! Find out your archetype here:`;
-  let quizUrl = `https://archtype-grok.vercel.app/result.html?archetype=${encodeURIComponent(topArchetype)}`;
+  let quizUrl = `https://archtype-grok.vercel.app/?archetype=${encodeURIComponent(topArchetype)}`;
   let facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(quizUrl)}&quote=${encodeURIComponent(shareText)}`;
   
   window.open(facebookUrl, '_blank');
