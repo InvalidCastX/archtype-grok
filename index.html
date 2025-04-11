@@ -14,9 +14,88 @@
 
   <!-- Load p5.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+
+  <!-- Add CSS for responsiveness and visual appeal -->
+  <style>
+    /* Reset default styles and ensure full-screen layout */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+      font-family: 'Poppins', sans-serif; /* Modern, clean font */
+      background: linear-gradient(135deg, #6e48aa, #9d50bb); /* Vibrant gradient background */
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    /* Style the p5.js canvas */
+    canvas {
+      display: block;
+      width: 100% !important; /* Ensure canvas scales to container */
+      height: auto !important;
+      max-width: 600px; /* Maximum width for larger screens */
+      max-height: 80vh; /* Prevent canvas from taking too much vertical space */
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+      background: rgba(255, 255, 255, 0.1); /* Semi-transparent white background */
+    }
+
+    /* Container for the quiz */
+    .quiz-container {
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      padding: 15px;
+    }
+
+    /* Style buttons (to be applied in sketch.js) */
+    .button {
+      transition: transform 0.1s ease, background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      transform: scale(1.05);
+    }
+
+    .button:active {
+      transform: scale(0.95);
+    }
+
+    /* Media query for mobile devices */
+    @media (max-width: 600px) {
+      body {
+        padding: 5px;
+      }
+
+      canvas {
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 15px;
+      }
+
+      .quiz-container {
+        padding: 10px;
+      }
+    }
+
+    /* Ensure font is loaded (optional, requires internet) */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+  </style>
 </head>
 <body>
-  <!-- Load the sketch.js file -->
-  <script src="sketch.js"></script>
+  <div class="quiz-container">
+    <!-- Load the sketch.js file -->
+    <script src="sketch.js"></script>
+  </div>
 </body>
 </html>
