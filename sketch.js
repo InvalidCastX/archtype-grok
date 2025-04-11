@@ -189,7 +189,7 @@ function drawBackground() {
   rect(width * 0.05, height * 0.05, width * 0.9, height * 0.9, 10);
 }
 
-function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
+function drawButton(x, y, w, h, stext, c1, c2, isPressed, isHovered) {
   let startColor = c1;
   let scaleFactor = 1.0;
   if (isPressed && mouseIsPressed) {
@@ -218,8 +218,8 @@ function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
   textSize(fontSizeMedium * 1.2);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
-  console.log(`Drawing button text: "${text}" at (${x + w / 2}, ${y + h / 2}) with size ${fontSizeMedium * 1.2}`);
-  text(text, x + w / 2, y + h / 2);
+  console.log(`Drawing button text: "${stext}" at (${x + w / 2}, ${y + h / 2}) with size ${fontSizeMedium * 1.2}`);
+  text(stext, x + w / 2, y + h / 2);
   pop();
 }
 function drawLandingPage() {
@@ -268,8 +268,8 @@ function drawLandingPage() {
   // Start Quiz button
   let buttonX = width / 2 - buttonWidth / 2;
   let buttonY = height * 0.75;
-  let c1 = color(255, 255, 255); //24, 119, 242); // #1877F2
-  let c2 = color(255, 255, 255); //(66, 165, 245); // #42A5F5
+  let c1 = color(24, 119, 242); // #1877F2
+  let c2 = color(66, 165, 245); // #42A5F5
   drawButton(buttonX, buttonY, buttonWidth, buttonHeight, "Start Quiz", c1, c2, buttonPressed.start, buttonHovered.start);
 
   drawingContext.shadowBlur = 0;
