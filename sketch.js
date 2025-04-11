@@ -109,7 +109,7 @@ function updateCanvasSize() {
     fontSizeLarge = 20;
     fontSizeMedium = 14;
     fontSizeSmall = 12;
-    buttonWidth = canvasWidth * 0.5;
+    buttonWidth = canvasWidth * 0.4;
     buttonHeight = canvasHeight * 0.08;
     buttonSpacing = canvasWidth * 0.04;
   } else {
