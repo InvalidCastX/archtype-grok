@@ -42,6 +42,26 @@ const archetypes = [
   { name: "Caregiver", desc: "Nurturing and supportive, rooted in empathy and independence.", traits: { empathy: 0.4, independence: 0.3, skills: 0.2, wisdom: 0.1, creativity: 0.0 } }
 ];
 
+// Fallback questions in case questions.json fails to load
+const fallbackQuestions = [
+  {
+    text: "How do you approach challenges?",
+    options: [
+      { text: "With careful planning", traits: { wisdom: 0.3, skills: 0.2 } },
+      { text: "With bold action", traits: { independence: 0.3, creativity: 0.2 } },
+      { text: "By seeking advice", traits: { empathy: 0.3, wisdom: 0.1 } }
+    ]
+  },
+  {
+    text: "What motivates you most?",
+    options: [
+      { text: "Helping others", traits: { empathy: 0.4, skills: 0.1 } },
+      { text: "Achieving goals", traits: { independence: 0.4, wisdom: 0.1 } },
+      { text: "Creating something new", traits: { creativity: 0.4, skills: 0.1 } }
+    ]
+  }
+];
+
 // Load the questions from questions.json before setup()
 function preload() {
   console.log("Preloading questions.json");
@@ -54,10 +74,14 @@ function preload() {
     } else {
       console.error("Loaded questions is not a valid array:", questions);
       questionsLoaded = false;
+      questions = fallbackQuestions; // Use fallback questions
+      console.log("Using fallback questions:", questions);
     }
   }, (error) => {
     console.error("Failed to load questions.json", error);
     questionsLoaded = false;
+    questions = fallbackQuestions; // Use fallback questions
+    console.log("Using fallback questions due to load failure:", questions);
   });
 }
 
@@ -66,12 +90,13 @@ function setup() {
   let canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.parent('quiz-container'); // Attach to the container in index.html
   textAlign(CENTER, CENTER);
-  console.log("Setup complete");
+  console.log("Setup complete, canvas created with size:", canvasWidth, "x", canvasHeight);
 }
 
 function windowResized() {
   updateCanvasSize();
   resizeCanvas(canvasWidth, canvasHeight);
+  console.log("Window resized, new canvas size:", canvasWidth, "x", canvasHeight);
 }
 
 function updateCanvasSize() {
@@ -99,11 +124,12 @@ function updateCanvasSize() {
 }
 
 function draw() {
-  if (!questionsLoaded || !Array.isArray(questions) || questions.length === 0) {
+  if (!questionsLoaded && questions.length === 0) {
     background(255, 255, 255, 50);
     fill(255);
     textSize(fontSizeMedium);
     text("Loading questions...", width / 2, height / 2);
+    console.log("Questions not yet loaded, showing loading screen");
     return;
   }
 
@@ -119,25 +145,20 @@ function draw() {
 }
 
 function drawLandingPage() {
-  // Semi-transparent background
   background(255, 255, 255, 50);
 
-  // Add shadow to text
   drawingContext.shadowBlur = 5;
   drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
 
-  // Title
   fill(255);
   textSize(fontSizeLarge);
   textStyle(BOLD);
   text("Discover Your Male Archetype", width / 2, height * 0.15);
 
-  // Subtitle
   textSize(fontSizeMedium);
   textStyle(NORMAL);
   text("Explore 12 universal patterns", width / 2, height * 0.25);
 
-  // Archetype list
   textSize(fontSizeSmall);
   let y = height * 0.35;
   for (let archetype of archetypes) {
@@ -146,13 +167,12 @@ function drawLandingPage() {
     y += fontSizeSmall * 1.5;
   }
 
-  // Start Quiz button with gradient
   let buttonX = width / 2 - buttonWidth / 2;
   let buttonY = height * 0.75;
-  let c1 = color(120, 81, 169); // Purple
-  let c2 = color(157, 80, 187); // Lighter purple
+  let c1 = color(120, 81, 169);
+  let c2 = color(157, 80, 187);
   if (buttonPressed.start && mouseIsPressed) {
-    c1 = color(100, 61, 149); // Darker shade when pressed
+    c1 = color(100, 61, 149);
     c2 = color(137, 60, 167);
   }
   for (let i = 0; i < buttonHeight; i++) {
@@ -182,40 +202,34 @@ function drawQuestion() {
   drawingContext.shadowBlur = 5;
   drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
 
-  // Question text
   fill(255);
   textSize(fontSizeLarge);
   text(q.text, width / 2, height * 0.15);
 
-  // Question number
   textSize(fontSizeSmall);
   fill(220);
   text(`Question ${currentQuestion + 1} of 10`, width / 2, height * 0.25);
 
-  // Options
   let optionYStart = height * 0.35;
   for (let i = 0; i < q.options.length; i++) {
     let y = optionYStart + i * (buttonHeight + buttonSpacing);
     let optionWidth = width * 0.8;
     let optionX = (width - optionWidth) / 2;
 
-    // Highlight selected option
     let fillColor = answers[currentQuestion] === i ? [220, 190, 255] : [255, 255, 255, 200];
     fill(fillColor);
     noStroke();
     rect(optionX, y - buttonHeight / 2, optionWidth, buttonHeight, 10);
 
-    // Option text
     fill(50);
     textSize(fontSizeMedium);
     text(q.options[i].text, width / 2, y);
   }
 
-  // Navigation buttons
   let navButtonY = height * 0.85;
 
   if (currentQuestion > 0) {
-    let c1 = color(100, 149, 237); // Blue
+    let c1 = color(100, 149, 237);
     let c2 = color(135, 206, 250);
     if (buttonPressed.prev && mouseIsPressed) {
       c1 = color(80, 129, 217);
@@ -233,7 +247,7 @@ function drawQuestion() {
     text("Previous", 20 + buttonWidth / 2, navButtonY + buttonHeight / 2);
   }
 
-  let c1 = color(255, 165, 0); // Orange
+  let c1 = color(255, 165, 0);
   let c2 = color(255, 215, 0);
   if (buttonPressed.next && mouseIsPressed) {
     c1 = color(235, 145, 0);
@@ -314,7 +328,7 @@ function drawResults() {
   }
 
   let shareButtonY = height * 0.75;
-  let c1 = color(59, 89, 152); // Facebook blue
+  let c1 = color(59, 89, 152);
   let c2 = color(120, 139, 192);
   if (buttonPressed.fb && mouseIsPressed) {
     c1 = color(39, 69, 132);
@@ -327,7 +341,7 @@ function drawResults() {
     line(width / 2 - buttonWidth - buttonSpacing / 2, shareButtonY + i, width / 2 - buttonSpacing / 2, shareButtonY + i);
   }
 
-  c1 = color(29, 161, 242); // Twitter blue
+  c1 = color(29, 161, 242);
   c2 = color(79, 191, 252);
   if (buttonPressed.twitter && mouseIsPressed) {
     c1 = color(9, 141, 222);
@@ -364,7 +378,7 @@ function mousePressed() {
     let buttonY = height * 0.75;
     if (mouseX > buttonX && mouseX < buttonX + buttonWidth && mouseY > buttonY && mouseY < buttonY + buttonHeight) {
       buttonPressed.start = true;
-      if (questionsLoaded && Array.isArray(questions) && questions.length > 0) {
+      if (questions.length > 0) {
         state = 'quiz';
         randomizedQuestions = shuffleArray([...questions]).slice(0, 10);
         currentQuestion = 0;
@@ -372,13 +386,12 @@ function mousePressed() {
         answers = Array(10).fill(-1);
         console.log("Quiz started, questions randomized:", randomizedQuestions);
       } else {
-        console.log("Cannot start quiz: questions not yet loaded or invalid", questions);
+        console.log("Cannot start quiz: no questions available", questions);
       }
     }
   } else if (state === 'quiz') {
     let q = randomizedQuestions[currentQuestion];
 
-    // Handle option selection
     let optionSelected = false;
     let optionYStart = height * 0.35;
     for (let i = 0; i < q.options.length; i++) {
@@ -394,7 +407,6 @@ function mousePressed() {
       }
     }
 
-    // Handle navigation
     let navButtonY = height * 0.85;
     if (!optionSelected) {
       if (currentQuestion > 0 && mouseX > 20 && mouseX < 20 + buttonWidth && mouseY > navButtonY && mouseY < navButtonY + buttonHeight) {
