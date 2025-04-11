@@ -25,6 +25,7 @@ let buttonWidth, buttonHeight, buttonSpacing;
 
 // Track button press for visual feedback
 let buttonPressed = { start: false, prev: false, next: false, fb: false, twitter: false };
+let buttonHovered = { start: false, prev: false, next: false, fb: false, twitter: false }; // Track hover state
 
 // Define archetypes
 const archetypes = [
@@ -74,13 +75,13 @@ function preload() {
     } else {
       console.error("Loaded questions is not a valid array:", questions);
       questionsLoaded = false;
-      questions = fallbackQuestions; // Use fallback questions
+      questions = fallbackQuestions;
       console.log("Using fallback questions:", questions);
     }
   }, (error) => {
     console.error("Failed to load questions.json", error);
     questionsLoaded = false;
-    questions = fallbackQuestions; // Use fallback questions
+    questions = fallbackQuestions;
     console.log("Using fallback questions due to load failure:", questions);
   });
 }
@@ -88,7 +89,7 @@ function preload() {
 function setup() {
   updateCanvasSize();
   let canvas = createCanvas(canvasWidth, canvasHeight);
-  canvas.parent('quiz-container'); // Attach to the container in index.html
+  canvas.parent('quiz-container');
   textAlign(CENTER, CENTER);
   console.log("Setup complete, canvas created with size:", canvasWidth, "x", canvasHeight);
 }
@@ -107,9 +108,9 @@ function updateCanvasSize() {
     fontSizeLarge = canvasWidth * 0.08;
     fontSizeMedium = canvasWidth * 0.05;
     fontSizeSmall = canvasWidth * 0.035;
-    buttonWidth = canvasWidth * 0.35;
-    buttonHeight = canvasHeight * 0.12;
-    buttonSpacing = canvasWidth * 0.05;
+    buttonWidth = canvasWidth * 0.25; // Reduced from 0.35
+    buttonHeight = canvasHeight * 0.08; // Reduced from 0.12
+    buttonSpacing = canvasWidth * 0.06; // Slightly increased spacing
   } else {
     // Desktop
     canvasWidth = 600;
@@ -117,9 +118,9 @@ function updateCanvasSize() {
     fontSizeLarge = 32;
     fontSizeMedium = 18;
     fontSizeSmall = 14;
-    buttonWidth = 120;
-    buttonHeight = 50;
-    buttonSpacing = 20;
+    buttonWidth = 100; // Reduced from 120
+    buttonHeight = 40; // Reduced from 50
+    buttonSpacing = 25; // Slightly increased spacing
   }
 }
 
@@ -133,6 +134,38 @@ function draw() {
     return;
   }
 
+  // Reset hover states
+  buttonHovered.start = false;
+  buttonHovered.prev = false;
+  buttonHovered.next = false;
+  buttonHovered.fb = false;
+  buttonHovered.twitter = false;
+
+  // Check for hover states
+  if (state === 'landing') {
+    let buttonX = width / 2 - buttonWidth / 2;
+    let buttonY = height * 0.75;
+    if (mouseX > buttonX && mouseX < buttonX + buttonWidth && mouseY > buttonY && mouseY < buttonY + buttonHeight) {
+      buttonHovered.start = true;
+    }
+  } else if (state === 'quiz') {
+    let navButtonY = height * 0.85;
+    if (currentQuestion > 0 && mouseX > 20 && mouseX < 20 + buttonWidth && mouseY > navButtonY && mouseY < navButtonY + buttonHeight) {
+      buttonHovered.prev = true;
+    }
+    if (mouseX > width - buttonWidth - 20 && mouseX < width - 20 && mouseY > navButtonY && mouseY < navButtonY + buttonHeight) {
+      buttonHovered.next = true;
+    }
+  } else if (state === 'results') {
+    let shareButtonY = height * 0.75;
+    if (mouseX > width / 2 - buttonWidth - buttonSpacing / 2 && mouseX < width / 2 - buttonSpacing / 2 && mouseY > shareButtonY && mouseY < shareButtonY + buttonHeight) {
+      buttonHovered.fb = true;
+    }
+    if (mouseX > width / 2 + buttonSpacing / 2 && mouseX < width / 2 + buttonWidth + buttonSpacing / 2 && mouseY > shareButtonY && mouseY < shareButtonY + buttonHeight) {
+      buttonHovered.twitter = true;
+    }
+  }
+
   if (state === 'landing') {
     drawLandingPage();
   } else if (state === 'quiz') {
@@ -142,6 +175,47 @@ function draw() {
   } else if (state === 'results') {
     drawResults();
   }
+}
+
+function drawButton(x, y, w, h, text, c1, c2, isPressed, isHovered) {
+  // Adjust colors based on hover and press states
+  let startColor = c1;
+  let endColor = c2;
+  if (isPressed && mouseIsPressed) {
+    startColor = color(red(c1) * 0.8, green(c1) * 0.8, blue(c1) * 0.8);
+    endColor = color(red(c2) * 0.8, green(c2) * 0.8, blue(c2) * 0.8);
+  } else if (isHovered) {
+    startColor = color(red(c1) * 1.1, green(c1) * 1.1, blue(c1) * 1.1);
+    endColor = color(red(c2) * 1.1, green(c2) * 1.1, blue(c2) * 1.1);
+  }
+
+  // Add shadow
+  drawingContext.shadowBlur = 10;
+  drawingContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
+
+  // Draw gradient
+  for (let i = 0; i < h; i++) {
+    let inter = map(i, 0, h, 0, 1);
+    let c = lerpColor(startColor, endColor, inter);
+    stroke(c);
+    line(x, y + i, x + w, y + i);
+  }
+
+  // Draw border
+  noFill();
+  stroke(255, 255, 255, 150); // Subtle white border
+  strokeWeight(2);
+  rect(x, y, w, h, 10);
+
+  // Reset stroke and shadow
+  noStroke();
+  drawingContext.shadowBlur = 0;
+
+  // Draw text
+  fill(255);
+  textSize(fontSizeMedium);
+  textStyle(NORMAL);
+  text(text, x + w / 2, y + h / 2);
 }
 
 function drawLandingPage() {
@@ -169,22 +243,9 @@ function drawLandingPage() {
 
   let buttonX = width / 2 - buttonWidth / 2;
   let buttonY = height * 0.75;
-  let c1 = color(120, 81, 169);
+  let c1 = color(120, 81, 169); // Purple
   let c2 = color(157, 80, 187);
-  if (buttonPressed.start && mouseIsPressed) {
-    c1 = color(100, 61, 149);
-    c2 = color(137, 60, 167);
-  }
-  for (let i = 0; i < buttonHeight; i++) {
-    let inter = map(i, 0, buttonHeight, 0, 1);
-    let c = lerpColor(c1, c2, inter);
-    stroke(c);
-    line(buttonX, buttonY + i, buttonX + buttonWidth, buttonY + i);
-  }
-  noStroke();
-  fill(255);
-  textSize(fontSizeMedium);
-  text("Start Quiz", width / 2, buttonY + buttonHeight / 2);
+  drawButton(buttonX, buttonY, buttonWidth, buttonHeight, "Start Quiz", c1, c2, buttonPressed.start, buttonHovered.start);
 
   drawingContext.shadowBlur = 0;
 }
@@ -229,40 +290,14 @@ function drawQuestion() {
   let navButtonY = height * 0.85;
 
   if (currentQuestion > 0) {
-    let c1 = color(100, 149, 237);
+    let c1 = color(100, 149, 237); // Blue
     let c2 = color(135, 206, 250);
-    if (buttonPressed.prev && mouseIsPressed) {
-      c1 = color(80, 129, 217);
-      c2 = color(115, 186, 230);
-    }
-    for (let i = 0; i < buttonHeight; i++) {
-      let inter = map(i, 0, buttonHeight, 0, 1);
-      let c = lerpColor(c1, c2, inter);
-      stroke(c);
-      line(20, navButtonY + i, 20 + buttonWidth, navButtonY + i);
-    }
-    noStroke();
-    fill(255);
-    textSize(fontSizeMedium);
-    text("Previous", 20 + buttonWidth / 2, navButtonY + buttonHeight / 2);
+    drawButton(20, navButtonY, buttonWidth, buttonHeight, "Previous", c1, c2, buttonPressed.prev, buttonHovered.prev);
   }
 
-  let c1 = color(255, 165, 0);
+  let c1 = color(255, 165, 0); // Orange
   let c2 = color(255, 215, 0);
-  if (buttonPressed.next && mouseIsPressed) {
-    c1 = color(235, 145, 0);
-    c2 = color(235, 195, 0);
-  }
-  for (let i = 0; i < buttonHeight; i++) {
-    let inter = map(i, 0, buttonHeight, 0, 1);
-    let c = lerpColor(c1, c2, inter);
-    stroke(c);
-    line(width - buttonWidth - 20, navButtonY + i, width - 20, navButtonY + i);
-  }
-  noStroke();
-  fill(255);
-  textSize(fontSizeMedium);
-  text(currentQuestion === 9 ? "Finish" : "Next", width - buttonWidth / 2 - 20, navButtonY + buttonHeight / 2);
+  drawButton(width - buttonWidth - 20, navButtonY, buttonWidth, buttonHeight, currentQuestion === 9 ? "Finish" : "Next", c1, c2, buttonPressed.next, buttonHovered.next);
 
   drawingContext.shadowBlur = 0;
 }
@@ -328,37 +363,13 @@ function drawResults() {
   }
 
   let shareButtonY = height * 0.75;
-  let c1 = color(59, 89, 152);
+  let c1 = color(59, 89, 152); // Facebook blue
   let c2 = color(120, 139, 192);
-  if (buttonPressed.fb && mouseIsPressed) {
-    c1 = color(39, 69, 132);
-    c2 = color(100, 119, 172);
-  }
-  for (let i = 0; i < buttonHeight; i++) {
-    let inter = map(i, 0, buttonHeight, 0, 1);
-    let c = lerpColor(c1, c2, inter);
-    stroke(c);
-    line(width / 2 - buttonWidth - buttonSpacing / 2, shareButtonY + i, width / 2 - buttonSpacing / 2, shareButtonY + i);
-  }
+  drawButton(width / 2 - buttonWidth - buttonSpacing / 2, shareButtonY, buttonWidth, buttonHeight, "Share on FB", c1, c2, buttonPressed.fb, buttonHovered.fb);
 
-  c1 = color(29, 161, 242);
+  c1 = color(29, 161, 242); // Twitter blue
   c2 = color(79, 191, 252);
-  if (buttonPressed.twitter && mouseIsPressed) {
-    c1 = color(9, 141, 222);
-    c2 = color(59, 171, 232);
-  }
-  for (let i = 0; i < buttonHeight; i++) {
-    let inter = map(i, 0, buttonHeight, 0, 1);
-    let c = lerpColor(c1, c2, inter);
-    stroke(c);
-    line(width / 2 + buttonSpacing / 2, shareButtonY + i, width / 2 + buttonWidth + buttonSpacing / 2, shareButtonY + i);
-  }
-
-  noStroke();
-  fill(255);
-  textSize(fontSizeMedium);
-  text("Share on FB", width / 2 - buttonWidth / 2 - buttonSpacing / 2, shareButtonY + buttonHeight / 2);
-  text("Share on X", width / 2 + buttonWidth / 2 + buttonSpacing / 2, shareButtonY + buttonHeight / 2);
+  drawButton(width / 2 + buttonSpacing / 2, shareButtonY, buttonWidth, buttonHeight, "Share on X", c1, c2, buttonPressed.twitter, buttonHovered.twitter);
 
   drawingContext.shadowBlur = 0;
 }
