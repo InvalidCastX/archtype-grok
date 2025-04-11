@@ -268,8 +268,8 @@ function drawLandingPage() {
   // Start Quiz button
   let buttonX = width / 2 - buttonWidth / 2;
   let buttonY = height * 0.75;
-  let c1 = color(24, 119, 242); // #1877F2
-  let c2 = color(66, 165, 245); // #42A5F5
+  let c1 = color(0,0,0); //24, 119, 242); // #1877F2
+  let c2 = color(0,0,0); //(66, 165, 245); // #42A5F5
   drawButton(buttonX, buttonY, buttonWidth, buttonHeight, "Start Quiz", c1, c2, buttonPressed.start, buttonHovered.start);
 
   drawingContext.shadowBlur = 0;
