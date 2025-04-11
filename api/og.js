@@ -24,9 +24,9 @@ export default function handler(req, res) {
   };
 
   const imageUrl = archetypeImageMap[archetype] || "https://archtype-grok.vercel.app/web-preview.png";
-  const redirectUrl = archetype ? `https://archtype-grok.vercel.app/?archetype=${encodeURIComponent(archetype)}` : "https://archtype-grok.vercel.app/";
+  const shareUrl = archetype ? `https://archtype-grok.vercel.app/?archetype=${encodeURIComponent(archetype)}` : "https://archtype-grok.vercel.app/";
 
-  // Return HTML with the correct OG tags
+  // Return HTML with the correct OG tags (no redirect)
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
     <!DOCTYPE html>
@@ -40,18 +40,13 @@ export default function handler(req, res) {
       <meta property="og:title" content="${title}">
       <meta property="og:description" content="${description}">
       <meta property="og:image" content="${imageUrl}">
-      <meta property="og:url" content="${redirectUrl}">
+      <meta property="og:url" content="${shareUrl}">
       <meta property="og:type" content="website">
-
-      <!-- Redirect to the main quiz page -->
-      <meta http-equiv="refresh" content="0;url=${redirectUrl}">
     </head>
     <body>
-      <p>Redirecting to the quiz...</p>
-      <script>
-        // Fallback redirect in case meta refresh doesn't work
-        window.location.href = "${redirectUrl}";
-      </script>
+      <h1>${title}</h1>
+      <p>${description}</p>
+      <p><a href="${shareUrl}">Take the quiz to discover your archetype!</a></p>
     </body>
     </html>
   `);
