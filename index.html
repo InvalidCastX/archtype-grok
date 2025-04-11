@@ -3,33 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<!-- Open Graph for Facebook -->
-    <meta property="og:title" content="Archetype Quiz">
-    <meta property="og:description" content="Can you beat my score? Play now!">
-    <meta property="og:url" content="https://archtype-grok.vercel.app">
-    <meta property="og:image" content="https://archtype-grok.vercel.app/web-preview.png">
-    <meta property="og:type" content="game">
-  
-  
   <title>Male Archetype Quiz</title>
+  <!-- Open Graph Metadata -->
+  <meta property="og:title" id="og-title" content="Discover Your Male Archetype">
+  <meta property="og:description" id="og-description" content="Take this quiz to explore 12 universal patterns of masculinity and find out which archetype you embody!">
+  <meta property="og:image" id="og-image" content="https://archtype-grok.vercel.app/web-preview.png"> <!-- Replace with your image URL -->
+  <meta property="og:url" id="og-url" content="https://archtype-grok.vercel.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Male Archetype Quiz">
+  <!-- Load p5.js and sketch.js -->
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.min.js"></script>
   <script src="sketch.js"></script>
   <style>
-    body {
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background-color: #f0f0f0;
-    }
-    canvas {
-      border: 1px solid #ccc;
-    }
+    body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f0f0; }
+    canvas { border: 1px solid #ccc; }
   </style>
 </head>
 <body>
+  <script>
+    // Dynamically update Open Graph tags based on URL query parameter
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const archetype = urlParams.get('archetype');
+      if (archetype) {
+        // Update OG tags with the archetype result
+        document.getElementById('og-title').setAttribute('content', `I’m a ${archetype}! Discover Your Archetype`);
+        document.getElementById('og-description').setAttribute('content', `I got ${archetype} in the Male Archetype Quiz! Take the quiz to find out which archetype you are.`);
+        // Optionally, you can set a specific image per archetype if you have them
+        document.getElementById('og-image').setAttribute('content', 'https://archtype-grok.vercel.app/preview-image.jpg');
+        document.getElementById('og-url').setAttribute('content', window.location.href);
+      }
+    };
+  </script>
 </body>
 </html>
